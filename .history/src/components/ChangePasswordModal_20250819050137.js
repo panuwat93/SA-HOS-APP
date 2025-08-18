@@ -1,0 +1,252 @@
+import React, { useState } from 'react';
+import { updatePassword } from 'firebase/auth';
+import { doc, updateDoc } from 'firebase/firestore';
+import { auth, db } from '../firebase';
+
+function ChangePasswordModal({ onClose }) {
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setSuccess('');
+
+    if (newPassword !== confirmPassword) {
+      setError('รหัสผ่านใหม่ไม่ตรงกัน');
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      setError('รหัสผ่านใหม่ต้องมีอย่างน้อย 6 ตัวอักษร');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      // อัพเดทรหัสผ่านใน Firebase Auth
+      await updatePassword(auth.currentUser, newPassword);
+      
+      // อัพเดทรหัสผ่านใน Firestore ด้วย
+      const user = auth.currentUser;
+      if (user) {
+        try {
+          await updateDoc(doc(db, 'users', user.uid), {
+            password: newPassword,
+            updatedAt: new Date().toISOString(),
+            lastPasswordChange: new Date().toISOString()
+          });
+          console.log('✅ บันทึกรหัสผ่านลงใน Firestore สำเร็จ');
+        } catch (firestoreError) {
+          console.error('❌ เกิดข้อผิดพลาดในการบันทึกลง Firestore:', firestoreError);
+          // แจ้งเตือนแต่ไม่หยุดการทำงาน
+          alert('⚠️ เปลี่ยนรหัสผ่านสำเร็จ แต่ไม่สามารถบันทึกลงฐานข้อมูลได้ กรุณาติดต่อแอดมิน');
+        }
+      }
+      
+      setSuccess('เปลี่ยนรหัสผ่านสำเร็จแล้ว และบันทึกลงฐานข้อมูลเรียบร้อย');
+      setTimeout(() => {
+        onClose();
+      }, 3000);
+    } catch (error) {
+      console.error('Change password error:', error);
+      if (error.code === 'auth/requires-recent-login') {
+        setError('กรุณาเข้าสู่ระบบใหม่เพื่อเปลี่ยนรหัสผ่าน');
+      } else {
+        setError('เกิดข้อผิดพลาดในการเปลี่ยนรหัสผ่าน');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+     return (
+     <div className="modal">
+       <div className="modal-content" style={{ 
+         position: 'relative',
+         width: '400px',
+         maxWidth: '90vw',
+         borderRadius: '16px',
+         boxShadow: '0 20px 40px rgba(0,0,0,0.15)',
+         border: '1px solid #e1e8ed'
+       }}>
+         <button className="modal-close" onClick={onClose} style={{
+           position: 'absolute',
+           right: '16px',
+           top: '16px',
+           background: 'none',
+           border: 'none',
+           fontSize: '24px',
+           cursor: 'pointer',
+           color: '#6c757d',
+           width: '32px',
+           height: '32px',
+           borderRadius: '50%',
+           display: 'flex',
+           alignItems: 'center',
+           justifyContent: 'center',
+           transition: 'all 0.2s ease'
+         }}>
+           ×
+         </button>
+         
+         <div className="modal-header" style={{
+           background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+           color: 'white',
+           padding: '24px 24px 20px 24px',
+           borderRadius: '16px 16px 0 0',
+           margin: '-1px -1px 0 -1px'
+         }}>
+           <h3 className="modal-title" style={{
+             margin: '0 0 8px 0',
+             fontSize: '20px',
+             fontWeight: '600',
+             display: 'flex',
+             alignItems: 'center',
+             gap: '12px'
+           }}>
+             🔐 เปลี่ยนรหัสผ่าน
+           </h3>
+           <p style={{ 
+             color: 'rgba(255,255,255,0.9)', 
+             margin: '0 0 12px 0',
+             fontSize: '14px'
+           }}>
+             กรุณากรอกข้อมูลเพื่อเปลี่ยนรหัสผ่าน
+           </p>
+           <div style={{ 
+             fontSize: '12px', 
+             color: 'rgba(255,255,255,0.8)', 
+             fontStyle: 'italic',
+             padding: '8px 12px',
+             background: 'rgba(255,255,255,0.1)',
+             borderRadius: '8px',
+             border: '1px solid rgba(255,255,255,0.2)'
+           }}>
+             💡 รหัสผ่านจะถูกบันทึกลงฐานข้อมูลเพื่อให้แอดมินสามารถดูได้
+           </div>
+         </div>
+
+                 <form onSubmit={handleSubmit} style={{ padding: '24px' }}>
+           <div className="form-group" style={{ marginBottom: '20px' }}>
+             <label className="form-label" style={{
+               display: 'block',
+               marginBottom: '8px',
+               fontSize: '14px',
+               fontWeight: '500',
+               color: '#2d3748'
+             }}>
+               รหัสผ่านใหม่
+             </label>
+             <input
+               type="password"
+               className="form-input"
+               value={newPassword}
+               onChange={(e) => setNewPassword(e.target.value)}
+               placeholder="รหัสผ่านใหม่อย่างน้อย 6 ตัวอักษร"
+               required
+               style={{ 
+                 width: '100%', 
+                 padding: '14px 16px',
+                 border: '2px solid #e2e8f0',
+                 borderRadius: '8px',
+                 fontSize: '14px',
+                 transition: 'all 0.2s ease',
+                 boxSizing: 'border-box'
+               }}
+             />
+           </div>
+
+           <div className="form-group" style={{ marginBottom: '24px' }}>
+             <label className="form-label" style={{
+               display: 'block',
+               marginBottom: '8px',
+               fontSize: '14px',
+               fontWeight: '500',
+               color: '#2d3748'
+             }}>
+               ยืนยันรหัสผ่านใหม่
+             </label>
+             <input
+               type="password"
+               className="form-input"
+               value={confirmPassword}
+               onChange={(e) => setConfirmPassword(e.target.value)}
+               placeholder="กรอกรหัสผ่านใหม่อีกครั้ง"
+               required
+               style={{ 
+                 width: '100%', 
+                 padding: '14px 16px',
+                 border: '2px solid #e2e8f0',
+                 borderRadius: '8px',
+                 fontSize: '14px',
+                 transition: 'all 0.2s ease',
+                 boxSizing: 'border-box'
+               }}
+             />
+           </div>
+
+          {error && (
+            <div style={{ 
+              color: '#e74c3c', 
+              backgroundColor: '#fdf2f2', 
+              padding: '12px', 
+              borderRadius: '8px', 
+              marginBottom: '20px',
+              textAlign: 'center'
+            }}>
+              {error}
+            </div>
+          )}
+
+          {success && (
+            <div style={{ 
+              color: '#27ae60', 
+              backgroundColor: '#f0f9ff', 
+              padding: '12px', 
+              borderRadius: '8px', 
+              marginBottom: '20px',
+              textAlign: 'center'
+            }}>
+              {success}
+            </div>
+          )}
+
+          <div style={{ display: 'flex', gap: '16px', marginTop: '20px' }}>
+            <button
+              type="button"
+              onClick={onClose}
+              className="btn btn-secondary"
+              style={{ 
+                flex: 1, 
+                padding: '12px 20px',
+                fontSize: '16px'
+              }}
+            >
+              ยกเลิก
+            </button>
+            <button
+              type="submit"
+              className="btn btn-primary"
+              style={{ 
+                flex: 1, 
+                padding: '12px 20px',
+                fontSize: '16px'
+              }}
+              disabled={loading}
+            >
+              {loading ? 'กำลังเปลี่ยนรหัสผ่าน...' : 'เปลี่ยนรหัสผ่าน'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+export default ChangePasswordModal;

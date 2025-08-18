@@ -1,0 +1,138 @@
+import React, { useState } from 'react';
+import { updatePassword } from 'firebase/auth';
+import { doc, updateDoc } from 'firebase/firestore';
+import { auth, db } from '../firebase';
+
+function ChangePasswordModal({ onClose }) {
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setSuccess('');
+
+    if (newPassword !== confirmPassword) {
+      setError('รหัสผ่านใหม่ไม่ตรงกัน');
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      setError('รหัสผ่านใหม่ต้องมีอย่างน้อย 6 ตัวอักษร');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      await updatePassword(auth.currentUser, newPassword);
+      setSuccess('เปลี่ยนรหัสผ่านสำเร็จแล้ว');
+      setTimeout(() => {
+        onClose();
+      }, 2000);
+    } catch (error) {
+      console.error('Change password error:', error);
+      if (error.code === 'auth/requires-recent-login') {
+        setError('กรุณาเข้าสู่ระบบใหม่เพื่อเปลี่ยนรหัสผ่าน');
+      } else {
+        setError('เกิดข้อผิดพลาดในการเปลี่ยนรหัสผ่าน');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="modal">
+      <div className="modal-content" style={{ position: 'relative' }}>
+        <button className="modal-close" onClick={onClose}>
+          ×
+        </button>
+        
+        <div className="modal-header">
+          <h3 className="modal-title">🔐 เปลี่ยนรหัสผ่าน</h3>
+          <p style={{ color: '#7f8c8d' }}>
+            กรุณากรอกข้อมูลเพื่อเปลี่ยนรหัสผ่าน
+          </p>
+        </div>
+
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label className="form-label">รหัสผ่านใหม่</label>
+            <input
+              type="password"
+              className="form-input"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              placeholder="รหัสผ่านใหม่อย่างน้อย 6 ตัวอักษร"
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">ยืนยันรหัสผ่านใหม่</label>
+            <input
+              type="password"
+              className="form-input"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              placeholder="กรอกรหัสผ่านใหม่อีกครั้ง"
+              required
+            />
+          </div>
+
+          {error && (
+            <div style={{ 
+              color: '#e74c3c', 
+              backgroundColor: '#fdf2f2', 
+              padding: '12px', 
+              borderRadius: '8px', 
+              marginBottom: '20px',
+              textAlign: 'center'
+            }}>
+              {error}
+            </div>
+          )}
+
+          {success && (
+            <div style={{ 
+              color: '#27ae60', 
+              backgroundColor: '#f0f9ff', 
+              padding: '12px', 
+              borderRadius: '8px', 
+              marginBottom: '20px',
+              textAlign: 'center'
+            }}>
+              {success}
+            </div>
+          )}
+
+          <div style={{ display: 'flex', gap: '12px' }}>
+            <button
+              type="button"
+              onClick={onClose}
+              className="btn btn-secondary"
+              style={{ flex: 1 }}
+            >
+              ยกเลิก
+            </button>
+            <button
+              type="submit"
+              className="btn btn-primary"
+              style={{ flex: 1 }}
+              disabled={loading}
+            >
+              {loading ? 'กำลังเปลี่ยนรหัสผ่าน...' : 'เปลี่ยนรหัสผ่าน'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+export default ChangePasswordModal;
