@@ -551,17 +551,17 @@ function StaffManagement() {
           console.log('🔒 รุ่งจินดา - บังคับให้เป็นไม่มีบัญชี');
         }
         
-        // console.log(`🔍 ค้นหาเจ้าหน้าที่ ${staff.firstName} ${staff.lastName}:`, userInfo);
+        console.log(`🔍 ค้นหาเจ้าหน้าที่ ${staff.firstName} ${staff.lastName}:`, userInfo);
         
         // แสดงข้อมูล debug เพิ่มเติมสำหรับการจับคู่
         if (!userInfo) {
           console.log(`❌ ไม่พบข้อมูลสำหรับ ${staff.firstName} ${staff.lastName}`);
-          // console.log('🔍 ข้อมูลที่ค้นหา:', {
-          //   staffFirstName: staff.firstName,
-          //   staffLastName: staff.lastName,
-          //   totalUsers: usersData.length,
-          //   userNames: usersData.map(u => `${u.firstName} ${u.lastName}`)
-          // });
+          console.log('🔍 ข้อมูลที่ค้นหา:', {
+            staffFirstName: staff.firstName,
+            staffLastName: staff.lastName,
+            totalUsers: usersData.length,
+            userNames: usersData.map(u => `${u.firstName} ${u.lastName}`)
+          });
         } else {
           console.log(`✅ พบข้อมูลสำหรับ ${staff.firstName} ${staff.lastName}:`, {
             userId: userInfo.id,

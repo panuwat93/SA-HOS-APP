@@ -2477,7 +2477,7 @@ function ScheduleManagement({ user }) {
         }
       }
       
-      // console.log('🔍 ตารางผู้ช่วยพยาบาล element:', assistantTable);
+      console.log('🔍 ตารางผู้ช่วยพยาบาล element:', assistantTable);
       
       // Debug: ดูข้อมูลของ element ที่เลือก
       if (assistantTable) {
@@ -2583,7 +2583,7 @@ function ScheduleManagement({ user }) {
       }
       
       // Debug: ดู HTML structure
-              // console.log('🔍 ตรวจสอบ HTML structure...');
+      console.log('🔍 ตรวจสอบ HTML structure...');
       const allScheduleSections = document.querySelectorAll('.schedule-table-section, .schedule-section');
       console.log('📊 พบ schedule sections:', allScheduleSections.length);
       allScheduleSections.forEach((section, index) => {

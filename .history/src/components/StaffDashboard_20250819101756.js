@@ -163,16 +163,16 @@ function StaffDashboard() {
                 <div className="user-permissions">
                   <span className="permission-label">สิทธิ์:</span>
                   
-                                    {/* Debug: แสดงข้อมูลสิทธิ์ */}
-                  {user?.canEditSchedule && (
-                    <span className="permission-badge schedule" title="แก้ไขตารางเวร">📅 แก้ไขตารางเวร</span>
-                  )}
-                  {user?.canAssignTasks && (
-                    <span className="permission-badge tasks" title="มอบหมายงาน">📋 มอบหมายงาน</span>
-                  )}
-                  {!user?.canEditSchedule && !user?.canAssignTasks && (
-                    <span className="permission-badge readonly" title="ดูอย่างเดียว">👁️ ดูอย่างเดียว</span>
-                  )}
+                                  {/* Debug: แสดงข้อมูลสิทธิ์ */}
+                {user?.canEditSchedule && (
+                  <span className="permission-badge schedule" title="แก้ไขตารางเวร">📅 แก้ไขตารางเวร</span>
+                )}
+                {user?.canAssignTasks && (
+                  <span className="permission-badge tasks" title="มอบหมายงาน">📋 มอบหมายงาน</span>
+                )}
+                {!user?.canEditSchedule && !user?.canAssignTasks && (
+                  <span className="permission-badge readonly" title="ดูอย่างเดียว">👁️ ดูอย่างเดียว</span>
+                )}
                 </div>
               </div>
             </div>

@@ -149,8 +149,8 @@ function StaffDashboard() {
           <div className="hospital-logo">
             <div className="logo-icon">🏥</div>
             <div className="logo-text">
-              <h1 className="hospital-name">SA HOS APP</h1>
-              <p className="hospital-subtitle">ระบบจัดตารางเวรและมอบหมายงาน - เจ้าหน้าที่</p>
+                      <h1 className="hospital-name">SA HOS APP</h1>
+        <p className="hospital-subtitle">ระบบจัดตารางเวรและมอบหมายงาน - เจ้าหน้าที่</p>
             </div>
           </div>
           <div className="user-info">
@@ -163,7 +163,14 @@ function StaffDashboard() {
                 <div className="user-permissions">
                   <span className="permission-label">สิทธิ์:</span>
                   
-                                    {/* Debug: แสดงข้อมูลสิทธิ์ */}
+                  {/* Debug: แสดงข้อมูลสิทธิ์ */}
+                  {/* console.log('🔍 StaffDashboard - User permissions:', {
+                    canEditSchedule: user?.canEditSchedule,
+                    canAssignTasks: user?.canAssignTasks,
+                    firstName: user?.firstName,
+                    lastName: user?.lastName
+                  })}
+                  
                   {user?.canEditSchedule && (
                     <span className="permission-badge schedule" title="แก้ไขตารางเวร">📅 แก้ไขตารางเวร</span>
                   )}

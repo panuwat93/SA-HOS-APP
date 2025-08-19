@@ -922,15 +922,15 @@ function ScheduleManagement({ user }) {
               // console.log('🔍 StaffManagement - Part time staff found:', partTimeStaff);
       
       if (partTimeStaff.length === 0) {
-                  // console.log('🔍 StaffManagement - No part time staff found in database');
+        console.log('🔍 StaffManagement - No part time staff found in database');
       } else {
-        // partTimeStaff.forEach((ptStaff, index) => {
-        //   // console.log(`🔍 Part time staff ${index + 1}:`, {
-        //     name: `${ptStaff.firstName} ${ptStaff.lastName}`,
-        //     canEditSchedule: ptStaff.canEditSchedule,
-        //     canAssignTasks: ptStaff.canAssignTasks
-        //   });
-        // });
+        partTimeStaff.forEach((ptStaff, index) => {
+          console.log(`🔍 Part time staff ${index + 1}:`, {
+            name: `${ptStaff.firstName} ${ptStaff.lastName}`,
+            canEditSchedule: ptStaff.canEditSchedule,
+            canAssignTasks: ptStaff.canAssignTasks
+          });
+        });
       }
       
       loadSchedule();
@@ -2337,13 +2337,13 @@ function ScheduleManagement({ user }) {
       
       // ถ้าไม่เจอ ลองหาแบบอื่น
       if (!nurseTable) {
-        // console.log('🔍 ลองหาแบบอื่น...');
+        console.log('🔍 ลองหาแบบอื่น...');
         if (allSections.length > 0) {
           nurseTable = allSections[0].querySelector('.schedule-table-container');
         }
       }
       
-      // console.log('🔍 ตารางพยาบาล element:', nurseTable);
+      console.log('🔍 ตารางพยาบาล element:', nurseTable);
       
       // Debug: ดูข้อมูลของ element ที่เลือก
       if (nurseTable) {
@@ -2471,13 +2471,13 @@ function ScheduleManagement({ user }) {
       
       // ถ้าไม่เจอ ลองหาแบบอื่น
       if (!assistantTable) {
-        // console.log('🔍 ลองหาแบบอื่น...');
+        console.log('🔍 ลองหาแบบอื่น...');
         if (allSections.length > 1) {
           assistantTable = allSections[1].querySelector('.schedule-table-container');
         }
       }
       
-      // console.log('🔍 ตารางผู้ช่วยพยาบาล element:', assistantTable);
+      console.log('🔍 ตารางผู้ช่วยพยาบาล element:', assistantTable);
       
       // Debug: ดูข้อมูลของ element ที่เลือก
       if (assistantTable) {
@@ -2583,7 +2583,7 @@ function ScheduleManagement({ user }) {
       }
       
       // Debug: ดู HTML structure
-              // console.log('🔍 ตรวจสอบ HTML structure...');
+      console.log('🔍 ตรวจสอบ HTML structure...');
       const allScheduleSections = document.querySelectorAll('.schedule-table-section, .schedule-section');
       console.log('📊 พบ schedule sections:', allScheduleSections.length);
       allScheduleSections.forEach((section, index) => {

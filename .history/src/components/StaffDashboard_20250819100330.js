@@ -33,26 +33,26 @@ function StaffDashboard() {
               const staffQuery = await getDocs(collection(db, 'staff'));
               let staffData = null;
               
-              // console.log('🔍 StaffDashboard - Searching for staff:', userData.firstName, userData.lastName);
-              // console.log('🔍 StaffDashboard - User position from users collection:', userData.position);
+              console.log('🔍 StaffDashboard - Searching for staff:', userData.firstName, userData.lastName);
+              console.log('🔍 StaffDashboard - User position from users collection:', userData.position);
               
               staffQuery.forEach((doc) => {
                 const data = doc.data();
-                // console.log('🔍 StaffDashboard - Checking staff:', data.firstName, data.lastName, {
-                //   position: data.position,
-                //   canEditSchedule: data.canEditSchedule,
-                //   canAssignTasks: data.canAssignTasks
-                // });
+                console.log('🔍 StaffDashboard - Checking staff:', data.firstName, data.lastName, {
+                  position: data.position,
+                  canEditSchedule: data.canEditSchedule,
+                  canAssignTasks: data.canAssignTasks
+                });
                 
                 if (data.firstName === userData.firstName && data.lastName === userData.lastName) {
                   staffData = { id: doc.id, ...data };
-                  // console.log('🔍 StaffDashboard - Found matching staff:', staffData);
+                  console.log('🔍 StaffDashboard - Found matching staff:', staffData);
                 }
               });
               
               if (!staffData) {
-                // console.log('🔍 StaffDashboard - No matching staff found for:', userData.firstName, userData.lastName);
-                // console.log('🔍 StaffDashboard - This might be a part time staff without database record');
+                console.log('🔍 StaffDashboard - No matching staff found for:', userData.firstName, userData.lastName);
+                console.log('🔍 StaffDashboard - This might be a part time staff without database record');
               }
               
               if (staffData) {
@@ -66,10 +66,10 @@ function StaffDashboard() {
                   canAssignTasks: staffData.canAssignTasks || false
                 };
                 
-                // console.log('🔍 StaffDashboard - Found staff data:', staffData);
-                // console.log('🔍 StaffDashboard - User with permissions:', userWithPermissions);
-                // console.log('🔍 StaffDashboard - canEditSchedule:', userWithPermissions.canEditSchedule);
-                // console.log('🔍 StaffDashboard - canAssignTasks:', userWithPermissions.canAssignTasks);
+                console.log('🔍 StaffDashboard - Found staff data:', staffData);
+                console.log('🔍 StaffDashboard - User with permissions:', userWithPermissions);
+                console.log('🔍 StaffDashboard - canEditSchedule:', userWithPermissions.canEditSchedule);
+                console.log('🔍 StaffDashboard - canAssignTasks:', userWithPermissions.canAssignTasks);
                 
                 setUser(userWithPermissions);
                 
@@ -87,8 +87,8 @@ function StaffDashboard() {
                   canAssignTasks: false
                 };
                 
-                // console.log('🔍 StaffDashboard - No staff data found, using defaults');
-                // console.log('🔍 StaffDashboard - User with default permissions:', userWithDefaultPermissions);
+                console.log('🔍 StaffDashboard - No staff data found, using defaults');
+                console.log('🔍 StaffDashboard - User with default permissions:', userWithDefaultPermissions);
                 
                 setUser(userWithDefaultPermissions);
                 const allStaffSnapshot = await getDocs(collection(db, 'staff'));
@@ -149,8 +149,8 @@ function StaffDashboard() {
           <div className="hospital-logo">
             <div className="logo-icon">🏥</div>
             <div className="logo-text">
-              <h1 className="hospital-name">SA HOS APP</h1>
-              <p className="hospital-subtitle">ระบบจัดตารางเวรและมอบหมายงาน - เจ้าหน้าที่</p>
+                      <h1 className="hospital-name">SA HOS APP</h1>
+        <p className="hospital-subtitle">ระบบจัดตารางเวรและมอบหมายงาน - เจ้าหน้าที่</p>
             </div>
           </div>
           <div className="user-info">
@@ -163,7 +163,14 @@ function StaffDashboard() {
                 <div className="user-permissions">
                   <span className="permission-label">สิทธิ์:</span>
                   
-                                    {/* Debug: แสดงข้อมูลสิทธิ์ */}
+                  {/* Debug: แสดงข้อมูลสิทธิ์ */}
+                  {console.log('🔍 StaffDashboard - User permissions:', {
+                    canEditSchedule: user?.canEditSchedule,
+                    canAssignTasks: user?.canAssignTasks,
+                    firstName: user?.firstName,
+                    lastName: user?.lastName
+                  })}
+                  
                   {user?.canEditSchedule && (
                     <span className="permission-badge schedule" title="แก้ไขตารางเวร">📅 แก้ไขตารางเวร</span>
                   )}
