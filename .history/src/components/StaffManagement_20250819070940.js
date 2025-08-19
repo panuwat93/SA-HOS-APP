@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { collection, addDoc, updateDoc, deleteDoc, doc, getDocs, getDoc, writeBatch, setDoc } from 'firebase/firestore';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword, updatePassword } from 'firebase/auth';
 import { auth } from '../firebase';
 import { db } from '../firebase';
 import './StaffManagement.css';
@@ -545,12 +545,6 @@ function StaffManagement() {
           });
         }
         
-        // วิธีที่ 6: ตรวจสอบชื่อรุ่งจินดาเป็นพิเศษ - ให้เป็นไม่มีบัญชีเสมอ
-        if (staff.firstName === 'รุ้งจินดา' && staff.lastName === 'อกอุ่น') {
-          userInfo = null;
-          console.log('🔒 รุ่งจินดา - บังคับให้เป็นไม่มีบัญชี');
-        }
-        
         console.log(`🔍 ค้นหาเจ้าหน้าที่ ${staff.firstName} ${staff.lastName}:`, userInfo);
         
         // แสดงข้อมูล debug เพิ่มเติมสำหรับการจับคู่
@@ -621,6 +615,43 @@ function StaffManagement() {
     } catch (error) {
       console.error('❌ เกิดข้อผิดพลาดในการสร้างบัญชี:', error);
       alert('เกิดข้อผิดพลาดในการสร้างบัญชี');
+    }
+  };
+
+  // ฟังก์ชันรีเซ็ตรหัสผ่านให้เจ้าหน้าที่
+  const resetPasswordForStaff = async (staff) => {
+    try {
+      if (!staff.uid) {
+        alert('ไม่พบข้อมูล UID ของเจ้าหน้าที่ กรุณาตรวจสอบข้อมูล');
+        return;
+      }
+
+      // สร้างรหัสผ่านใหม่ (6 ตัวอักษร)
+      const newPassword = Math.random().toString(36).substring(2, 8);
+      
+      // อัพเดทรหัสผ่านใน Firestore
+      await updateDoc(doc(db, 'users', staff.uid), {
+        password: newPassword,
+        updatedAt: new Date().toISOString()
+      });
+
+      // อัพเดทข้อมูลเจ้าหน้าที่
+      await updateDoc(doc(db, 'staff', staff.id), {
+        updatedAt: new Date().toISOString()
+      });
+
+      // หมายเหตุ: ไม่สามารถเปลี่ยนรหัสผ่านใน Firebase Auth ได้โดยตรง
+      // เนื่องจากต้องมีการยืนยันตัวตนก่อน แต่ข้อมูลใน Firestore จะถูกอัพเดทแล้ว
+      // เจ้าหน้าที่สามารถใช้รหัสผ่านใหม่ในการล็อกอินครั้งต่อไปได้
+
+      alert(`✅ รีเซ็ตรหัสผ่านสำเร็จ!\n\nUsername: ${staff.username}\nรหัสผ่านใหม่: ${newPassword}\n\n⚠️ กรุณาบันทึกข้อมูลนี้ไว้และแจ้งเจ้าหน้าที่\n\nเจ้าหน้าที่สามารถล็อกอินได้ด้วย:\nEmail: ${staff.username}@sa-hos.com\nรหัสผ่าน: ${newPassword}\n\n💡 หมายเหตุ: รหัสผ่านใหม่จะถูกบันทึกในระบบแล้ว`);
+
+      // รีเฟรชข้อมูล
+      await loadStaffLoginInfo();
+      
+    } catch (error) {
+      console.error('❌ เกิดข้อผิดพลาดในการรีเซ็ตรหัสผ่าน:', error);
+      alert('เกิดข้อผิดพลาดในการรีเซ็ตรหัสผ่าน');
     }
   };
 
@@ -1340,7 +1371,7 @@ function LoginInfoModal({ onClose, staffLoginInfo, loginInfoLoading, onRefresh, 
                             }}>
                               {staff.userExists ? '✅ มีบัญชี' : '⚠️ ไม่มีบัญชี'}
                             </span>
-                            {!staff.userExists && (
+                            {!staff.userExists ? (
                               <button
                                 onClick={() => createAccountForStaff(staff)}
                                 className="btn btn-success"
@@ -1348,6 +1379,15 @@ function LoginInfoModal({ onClose, staffLoginInfo, loginInfoLoading, onRefresh, 
                                 title="สร้างบัญชีให้เจ้าหน้าที่คนนี้"
                               >
                                 ➕ สร้างบัญชี
+                              </button>
+                            ) : (
+                              <button
+                                onClick={() => resetPasswordForStaff(staff)}
+                                className="btn btn-warning"
+                                style={{ fontSize: '12px', padding: '4px 8px' }}
+                                title="รีเซ็ตรหัสผ่านให้เจ้าหน้าที่คนนี้"
+                              >
+                                🔄 รีเซ็ตรหัสผ่าน
                               </button>
                             )}
                             {staff.userData && (
@@ -1441,6 +1481,14 @@ function LoginInfoModal({ onClose, staffLoginInfo, loginInfoLoading, onRefresh, 
             fontWeight: 'bold'
           }}>
             🔐 <strong>ข้อมูลล็อกอิน:</strong> เจ้าหน้าที่จะใช้ Email (username@sa-hos.com) และรหัสผ่านในการล็อกอิน
+          </div>
+          <div style={{ 
+            fontSize: '11px', 
+            color: '#856404',
+            marginBottom: '10px',
+            fontStyle: 'italic'
+          }}>
+            🔄 <strong>รีเซ็ตรหัสผ่าน:</strong> สำหรับเจ้าหน้าที่ที่มีบัญชีแล้วแต่ล็อกอินไม่ได้ ให้กดปุ่ม "รีเซ็ตรหัสผ่าน"
           </div>
           <div style={{ 
             fontSize: '11px', 

@@ -545,12 +545,6 @@ function StaffManagement() {
           });
         }
         
-        // วิธีที่ 6: ตรวจสอบชื่อรุ่งจินดาเป็นพิเศษ - ให้เป็นไม่มีบัญชีเสมอ
-        if (staff.firstName === 'รุ้งจินดา' && staff.lastName === 'อกอุ่น') {
-          userInfo = null;
-          console.log('🔒 รุ่งจินดา - บังคับให้เป็นไม่มีบัญชี');
-        }
-        
         console.log(`🔍 ค้นหาเจ้าหน้าที่ ${staff.firstName} ${staff.lastName}:`, userInfo);
         
         // แสดงข้อมูล debug เพิ่มเติมสำหรับการจับคู่
@@ -1340,7 +1334,7 @@ function LoginInfoModal({ onClose, staffLoginInfo, loginInfoLoading, onRefresh, 
                             }}>
                               {staff.userExists ? '✅ มีบัญชี' : '⚠️ ไม่มีบัญชี'}
                             </span>
-                            {!staff.userExists && (
+                            {!staff.userExists ? (
                               <button
                                 onClick={() => createAccountForStaff(staff)}
                                 className="btn btn-success"
@@ -1348,6 +1342,15 @@ function LoginInfoModal({ onClose, staffLoginInfo, loginInfoLoading, onRefresh, 
                                 title="สร้างบัญชีให้เจ้าหน้าที่คนนี้"
                               >
                                 ➕ สร้างบัญชี
+                              </button>
+                            ) : (
+                              <button
+                                onClick={() => resetPasswordForStaff(staff)}
+                                className="btn btn-warning"
+                                style={{ fontSize: '12px', padding: '4px 8px' }}
+                                title="รีเซ็ตรหัสผ่านให้เจ้าหน้าที่คนนี้"
+                              >
+                                🔄 รีเซ็ตรหัสผ่าน
                               </button>
                             )}
                             {staff.userData && (

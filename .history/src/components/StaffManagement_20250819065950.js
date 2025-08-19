@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { collection, addDoc, updateDoc, deleteDoc, doc, getDocs, getDoc, writeBatch, setDoc } from 'firebase/firestore';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../firebase';
 import { db } from '../firebase';
 import './StaffManagement.css';
@@ -545,12 +544,6 @@ function StaffManagement() {
           });
         }
         
-        // วิธีที่ 6: ตรวจสอบชื่อรุ่งจินดาเป็นพิเศษ - ให้เป็นไม่มีบัญชีเสมอ
-        if (staff.firstName === 'รุ้งจินดา' && staff.lastName === 'อกอุ่น') {
-          userInfo = null;
-          console.log('🔒 รุ่งจินดา - บังคับให้เป็นไม่มีบัญชี');
-        }
-        
         console.log(`🔍 ค้นหาเจ้าหน้าที่ ${staff.firstName} ${staff.lastName}:`, userInfo);
         
         // แสดงข้อมูล debug เพิ่มเติมสำหรับการจับคู่
@@ -579,7 +572,6 @@ function StaffManagement() {
           lastPasswordChange: userInfo?.lastPasswordChange || userInfo?.metadata?.lastSignInTime || 'ไม่พบข้อมูล',
           userExists: !!userInfo,
           userId: userInfo?.id || null,
-          uid: userInfo?.uid || null, // เพิ่ม UID จาก Firebase Auth
           userData: userInfo // เก็บข้อมูลผู้ใช้ทั้งหมดเพื่อ debug
         };
       });
@@ -653,57 +645,39 @@ function StaffManagement() {
         return;
       }
 
-      // สร้างบัญชีใน Firebase Authentication
-      const email = `${username}@sa-hos.com`;
+      // สร้างข้อมูลผู้ใช้ใน Firestore พร้อม username และ password
+      const newUser = {
+        username: username,
+        firstName: creatingStaff.firstName,
+        lastName: creatingStaff.lastName,
+        department: creatingStaff.department || currentAdmin?.department || 'หอผู้ป่วยศัลยกรรมอุบัติเหตุ',
+        position: creatingStaff.position,
+        role: 'staff',
+        password: password, // เก็บรหัสผ่านไว้ใน Firestore
+        createdAt: new Date().toISOString(),
+        status: 'active'
+      };
       
-      try {
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        const user = userCredential.user;
-        
-        // สร้างข้อมูลผู้ใช้ใน Firestore
-        const newUser = {
-          username: username,
-          firstName: creatingStaff.firstName,
-          lastName: creatingStaff.lastName,
-          department: creatingStaff.department || currentAdmin?.department || 'หอผู้ป่วยศัลยกรรมอุบัติเหตุ',
-          position: creatingStaff.position,
-          role: 'staff',
-          password: password, // เก็บรหัสผ่านเริ่มต้นไว้ใน Firestore
-          createdAt: new Date().toISOString(),
-          uid: user.uid // เก็บ UID จาก Firebase Auth
-        };
-        
-        // บันทึกข้อมูลใน users collection โดยใช้ UID เป็น document ID
-        await setDoc(doc(db, 'users', user.uid), newUser);
-        
-        // อัพเดทข้อมูลเจ้าหน้าที่ให้มี userId และ uid
-        await updateDoc(doc(db, 'staff', creatingStaff.id), {
-          userId: user.uid,
-          uid: user.uid,
-          updatedAt: new Date().toISOString()
-        });
-        
-        alert(`✅ สร้างบัญชีสำเร็จ!\n\nUsername: ${username}\nรหัสผ่าน: ${password}\n\n⚠️ กรุณาบันทึกข้อมูลนี้ไว้และแจ้งเจ้าหน้าที่\n\nเจ้าหน้าที่สามารถล็อกอินได้ด้วย:\nEmail: ${email}\nรหัสผ่าน: ${password}`);
-        
-        // ปิดโมดัลและรีเซ็ต
-        setShowCreateAccountModal(false);
-        setCreatingStaff(null);
-        
-        // รีเฟรชข้อมูล
-        await loadStaffLoginInfo();
-        
-      } catch (authError) {
-        console.error('❌ เกิดข้อผิดพลาดในการสร้างบัญชีใน Firebase Auth:', authError);
-        if (authError.code === 'auth/email-already-in-use') {
-          alert('Username นี้มีผู้ใช้งานแล้ว กรุณาเลือก Username อื่น');
-        } else {
-          alert(`เกิดข้อผิดพลาดในการสร้างบัญชี: ${authError.message}`);
-        }
-      }
+      // สร้าง document ใน users collection
+      const userRef = await addDoc(collection(db, 'users'), newUser);
       
+      // อัพเดทข้อมูลเจ้าหน้าที่ให้มี userId
+      await updateDoc(doc(db, 'staff', creatingStaff.id), {
+        userId: userRef.id,
+        updatedAt: new Date().toISOString()
+      });
+      
+      alert(`✅ สร้างบัญชีสำเร็จ!\n\nUsername: ${username}\nรหัสผ่าน: ${password}\n\n⚠️ กรุณาบันทึกข้อมูลนี้ไว้และแจ้งเจ้าหน้าที่\n\n💡 เจ้าหน้าที่สามารถล็อกอินด้วย Username และรหัสผ่านได้เลย!`);
+      
+      // ปิดโมดัลและรีเซ็ต
+      setShowCreateAccountModal(false);
+      setCreatingStaff(null);
+      
+      // รีเฟรชข้อมูล
+      await loadStaffLoginInfo();
     } catch (error) {
       console.error('❌ เกิดข้อผิดพลาดในการสร้างบัญชี:', error);
-      alert('เกิดข้อผิดพลาดในการสร้างบัญชี');
+      alert('เกิดข้อผิดพลาดในการสร้างบัญชี: ' + error.message);
     }
   };
 
@@ -1271,7 +1245,6 @@ function LoginInfoModal({ onClose, staffLoginInfo, loginInfoLoading, onRefresh, 
                         <th style={{ padding: '8px', border: '1px solid #dee2e6', textAlign: 'left' }}>ตำแหน่ง</th>
                         <th style={{ padding: '8px', border: '1px solid #dee2e6', textAlign: 'left' }}>Username</th>
                         <th style={{ padding: '8px', border: '1px solid #dee2e6', textAlign: 'left' }}>รหัสผ่าน</th>
-                        <th style={{ padding: '8px', border: '1px solid #dee2e6', textAlign: 'left' }}>Email</th>
                         <th style={{ padding: '8px', border: '1px solid #dee2e6', textAlign: 'left' }}>สถานะ</th>
                       </tr>
                     </thead>
@@ -1311,17 +1284,6 @@ function LoginInfoModal({ onClose, staffLoginInfo, loginInfoLoading, onRefresh, 
                           {staff.userExists ? (
                             <span style={{ color: '#28a745', fontWeight: 'bold' }}>
                               {staff.password || 'ไม่พบข้อมูล'}
-                            </span>
-                          ) : (
-                            <span style={{ color: '#856404', fontStyle: 'italic' }}>
-                              ยังไม่มีข้อมูล
-                            </span>
-                          )}
-                        </td>
-                        <td style={{ padding: '8px', border: '1px solid #dee2e6', fontFamily: 'monospace' }}>
-                          {staff.userExists ? (
-                            <span style={{ color: '#28a745', fontWeight: 'bold' }}>
-                              {staff.username}@sa-hos.com
                             </span>
                           ) : (
                             <span style={{ color: '#856404', fontStyle: 'italic' }}>
@@ -1436,14 +1398,6 @@ function LoginInfoModal({ onClose, staffLoginInfo, loginInfoLoading, onRefresh, 
           </div>
           <div style={{ 
             fontSize: '11px', 
-            color: '#28a745',
-            marginBottom: '10px',
-            fontWeight: 'bold'
-          }}>
-            🔐 <strong>ข้อมูลล็อกอิน:</strong> เจ้าหน้าที่จะใช้ Email (username@sa-hos.com) และรหัสผ่านในการล็อกอิน
-          </div>
-          <div style={{ 
-            fontSize: '11px', 
             color: '#856404',
             marginBottom: '10px',
             fontStyle: 'italic'
@@ -1507,14 +1461,6 @@ function CreateAccountModal({ staff, onClose, onSubmit }) {
         
         <div className="modal-header">
           <h3 className="modal-title">➕ สร้างบัญชีให้เจ้าหน้าที่</h3>
-          <div style={{ 
-            fontSize: '12px', 
-            color: '#28a745', 
-            marginTop: '5px',
-            fontWeight: 'normal'
-          }}>
-            บัญชีจะถูกสร้างใน Firebase Authentication และสามารถล็อกอินได้ทันที
-          </div>
         </div>
 
         <form onSubmit={handleSubmit} className="create-account-form">

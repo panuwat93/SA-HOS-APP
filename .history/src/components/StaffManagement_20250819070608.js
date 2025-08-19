@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { collection, addDoc, updateDoc, deleteDoc, doc, getDocs, getDoc, writeBatch, setDoc } from 'firebase/firestore';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword, deleteUser } from 'firebase/auth';
 import { auth } from '../firebase';
 import { db } from '../firebase';
 import './StaffManagement.css';
@@ -545,12 +545,6 @@ function StaffManagement() {
           });
         }
         
-        // วิธีที่ 6: ตรวจสอบชื่อรุ่งจินดาเป็นพิเศษ - ให้เป็นไม่มีบัญชีเสมอ
-        if (staff.firstName === 'รุ้งจินดา' && staff.lastName === 'อกอุ่น') {
-          userInfo = null;
-          console.log('🔒 รุ่งจินดา - บังคับให้เป็นไม่มีบัญชี');
-        }
-        
         console.log(`🔍 ค้นหาเจ้าหน้าที่ ${staff.firstName} ${staff.lastName}:`, userInfo);
         
         // แสดงข้อมูล debug เพิ่มเติมสำหรับการจับคู่
@@ -621,6 +615,37 @@ function StaffManagement() {
     } catch (error) {
       console.error('❌ เกิดข้อผิดพลาดในการสร้างบัญชี:', error);
       alert('เกิดข้อผิดพลาดในการสร้างบัญชี');
+    }
+  };
+
+  // ฟังก์ชันลบบัญชีของเจ้าหน้าที่
+  const handleDeleteAccount = async (staff) => {
+    if (!window.confirm(`คุณต้องการลบบัญชีของ ${staff.firstName} ${staff.lastName} หรือไม่?\n\n⚠️ การดำเนินการนี้จะลบบัญชีออกจาก Firebase Authentication และ Firestore ทั้งหมด\n\nหากต้องการสร้างบัญชีใหม่ ให้กดปุ่ม "สร้างบัญชี" หลังจากลบแล้ว`)) {
+      return;
+    }
+
+    try {
+      // ลบข้อมูลจาก users collection ใน Firestore
+      if (staff.userId) {
+        await deleteDoc(doc(db, 'users', staff.userId));
+        console.log('✅ ลบข้อมูลจาก users collection สำเร็จ');
+      }
+
+      // ลบข้อมูลจาก staff collection ใน Firestore
+      await deleteDoc(doc(db, 'staff', staff.id));
+      console.log('✅ ลบข้อมูลจาก staff collection สำเร็จ');
+
+      // อัพเดท staffList
+      setStaffList(prev => prev.filter(s => s.id !== staff.id));
+      
+      // รีเฟรชข้อมูลล็อกอิน
+      await loadStaffLoginInfo();
+      
+      alert(`✅ ลบบัญชีของ ${staff.firstName} ${staff.lastName} เรียบร้อยแล้ว\n\nตอนนี้สามารถสร้างบัญชีใหม่ได้แล้ว`);
+      
+    } catch (error) {
+      console.error('❌ เกิดข้อผิดพลาดในการลบบัญชี:', error);
+      alert('เกิดข้อผิดพลาดในการลบบัญชี');
     }
   };
 
@@ -1434,14 +1459,7 @@ function LoginInfoModal({ onClose, staffLoginInfo, loginInfoLoading, onRefresh, 
           }}>
             💡 <strong>คำแนะนำ:</strong> สำหรับเจ้าหน้าที่ที่ไม่มีบัญชี ให้กดปุ่ม "สร้างบัญชี" เพื่อสร้างบัญชีใหม่
           </div>
-          <div style={{ 
-            fontSize: '11px', 
-            color: '#28a745',
-            marginBottom: '10px',
-            fontWeight: 'bold'
-          }}>
-            🔐 <strong>ข้อมูลล็อกอิน:</strong> เจ้าหน้าที่จะใช้ Email (username@sa-hos.com) และรหัสผ่านในการล็อกอิน
-          </div>
+
           <div style={{ 
             fontSize: '11px', 
             color: '#856404',
@@ -1507,14 +1525,6 @@ function CreateAccountModal({ staff, onClose, onSubmit }) {
         
         <div className="modal-header">
           <h3 className="modal-title">➕ สร้างบัญชีให้เจ้าหน้าที่</h3>
-          <div style={{ 
-            fontSize: '12px', 
-            color: '#28a745', 
-            marginTop: '5px',
-            fontWeight: 'normal'
-          }}>
-            บัญชีจะถูกสร้างใน Firebase Authentication และสามารถล็อกอินได้ทันที
-          </div>
         </div>
 
         <form onSubmit={handleSubmit} className="create-account-form">
@@ -1612,7 +1622,7 @@ function CreateAccountModal({ staff, onClose, onSubmit }) {
               ยกเลิก
             </button>
             <button type="submit" className="btn btn-primary">
-              ✅ สร้างบัญชี
+              ✅ สร้างบัญชีใน Firebase Auth
             </button>
           </div>
         </form>

@@ -545,12 +545,6 @@ function StaffManagement() {
           });
         }
         
-        // วิธีที่ 6: ตรวจสอบชื่อรุ่งจินดาเป็นพิเศษ - ให้เป็นไม่มีบัญชีเสมอ
-        if (staff.firstName === 'รุ้งจินดา' && staff.lastName === 'อกอุ่น') {
-          userInfo = null;
-          console.log('🔒 รุ่งจินดา - บังคับให้เป็นไม่มีบัญชี');
-        }
-        
         console.log(`🔍 ค้นหาเจ้าหน้าที่ ${staff.firstName} ${staff.lastName}:`, userInfo);
         
         // แสดงข้อมูล debug เพิ่มเติมสำหรับการจับคู่
@@ -579,7 +573,6 @@ function StaffManagement() {
           lastPasswordChange: userInfo?.lastPasswordChange || userInfo?.metadata?.lastSignInTime || 'ไม่พบข้อมูล',
           userExists: !!userInfo,
           userId: userInfo?.id || null,
-          uid: userInfo?.uid || null, // เพิ่ม UID จาก Firebase Auth
           userData: userInfo // เก็บข้อมูลผู้ใช้ทั้งหมดเพื่อ debug
         };
       });
@@ -1271,7 +1264,6 @@ function LoginInfoModal({ onClose, staffLoginInfo, loginInfoLoading, onRefresh, 
                         <th style={{ padding: '8px', border: '1px solid #dee2e6', textAlign: 'left' }}>ตำแหน่ง</th>
                         <th style={{ padding: '8px', border: '1px solid #dee2e6', textAlign: 'left' }}>Username</th>
                         <th style={{ padding: '8px', border: '1px solid #dee2e6', textAlign: 'left' }}>รหัสผ่าน</th>
-                        <th style={{ padding: '8px', border: '1px solid #dee2e6', textAlign: 'left' }}>Email</th>
                         <th style={{ padding: '8px', border: '1px solid #dee2e6', textAlign: 'left' }}>สถานะ</th>
                       </tr>
                     </thead>
@@ -1311,17 +1303,6 @@ function LoginInfoModal({ onClose, staffLoginInfo, loginInfoLoading, onRefresh, 
                           {staff.userExists ? (
                             <span style={{ color: '#28a745', fontWeight: 'bold' }}>
                               {staff.password || 'ไม่พบข้อมูล'}
-                            </span>
-                          ) : (
-                            <span style={{ color: '#856404', fontStyle: 'italic' }}>
-                              ยังไม่มีข้อมูล
-                            </span>
-                          )}
-                        </td>
-                        <td style={{ padding: '8px', border: '1px solid #dee2e6', fontFamily: 'monospace' }}>
-                          {staff.userExists ? (
-                            <span style={{ color: '#28a745', fontWeight: 'bold' }}>
-                              {staff.username}@sa-hos.com
                             </span>
                           ) : (
                             <span style={{ color: '#856404', fontStyle: 'italic' }}>
@@ -1436,14 +1417,6 @@ function LoginInfoModal({ onClose, staffLoginInfo, loginInfoLoading, onRefresh, 
           </div>
           <div style={{ 
             fontSize: '11px', 
-            color: '#28a745',
-            marginBottom: '10px',
-            fontWeight: 'bold'
-          }}>
-            🔐 <strong>ข้อมูลล็อกอิน:</strong> เจ้าหน้าที่จะใช้ Email (username@sa-hos.com) และรหัสผ่านในการล็อกอิน
-          </div>
-          <div style={{ 
-            fontSize: '11px', 
             color: '#856404',
             marginBottom: '10px',
             fontStyle: 'italic'
@@ -1507,14 +1480,6 @@ function CreateAccountModal({ staff, onClose, onSubmit }) {
         
         <div className="modal-header">
           <h3 className="modal-title">➕ สร้างบัญชีให้เจ้าหน้าที่</h3>
-          <div style={{ 
-            fontSize: '12px', 
-            color: '#28a745', 
-            marginTop: '5px',
-            fontWeight: 'normal'
-          }}>
-            บัญชีจะถูกสร้างใน Firebase Authentication และสามารถล็อกอินได้ทันที
-          </div>
         </div>
 
         <form onSubmit={handleSubmit} className="create-account-form">

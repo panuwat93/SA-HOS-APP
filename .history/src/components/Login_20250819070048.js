@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import { auth, db } from '../firebase';
@@ -129,14 +129,6 @@ function Login() {
               </span>
               <div className="btn-loading-spinner"></div>
             </button>
-
-            <div className="register-section">
-              <p className="register-text">ยังไม่มีบัญชี?</p>
-              <Link to="/register" className="register-btn-link">
-                <span>สมัครสมาชิก</span>
-                <div className="btn-arrow">→</div>
-              </Link>
-            </div>
           </form>
         </div>
       </div>

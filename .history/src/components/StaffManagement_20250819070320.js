@@ -545,12 +545,6 @@ function StaffManagement() {
           });
         }
         
-        // วิธีที่ 6: ตรวจสอบชื่อรุ่งจินดาเป็นพิเศษ - ให้เป็นไม่มีบัญชีเสมอ
-        if (staff.firstName === 'รุ้งจินดา' && staff.lastName === 'อกอุ่น') {
-          userInfo = null;
-          console.log('🔒 รุ่งจินดา - บังคับให้เป็นไม่มีบัญชี');
-        }
-        
         console.log(`🔍 ค้นหาเจ้าหน้าที่ ${staff.firstName} ${staff.lastName}:`, userInfo);
         
         // แสดงข้อมูล debug เพิ่มเติมสำหรับการจับคู่
@@ -1436,14 +1430,6 @@ function LoginInfoModal({ onClose, staffLoginInfo, loginInfoLoading, onRefresh, 
           </div>
           <div style={{ 
             fontSize: '11px', 
-            color: '#28a745',
-            marginBottom: '10px',
-            fontWeight: 'bold'
-          }}>
-            🔐 <strong>ข้อมูลล็อกอิน:</strong> เจ้าหน้าที่จะใช้ Email (username@sa-hos.com) และรหัสผ่านในการล็อกอิน
-          </div>
-          <div style={{ 
-            fontSize: '11px', 
             color: '#856404',
             marginBottom: '10px',
             fontStyle: 'italic'
@@ -1507,14 +1493,6 @@ function CreateAccountModal({ staff, onClose, onSubmit }) {
         
         <div className="modal-header">
           <h3 className="modal-title">➕ สร้างบัญชีให้เจ้าหน้าที่</h3>
-          <div style={{ 
-            fontSize: '12px', 
-            color: '#28a745', 
-            marginTop: '5px',
-            fontWeight: 'normal'
-          }}>
-            บัญชีจะถูกสร้างใน Firebase Authentication และสามารถล็อกอินได้ทันที
-          </div>
         </div>
 
         <form onSubmit={handleSubmit} className="create-account-form">

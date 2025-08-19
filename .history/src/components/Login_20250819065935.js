@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import { auth, db } from '../firebase';
@@ -18,32 +18,52 @@ function Login() {
     setLoading(true);
 
     try {
-      // ใช้ username@sa-hos.com เป็น email สำหรับ Firebase
-      const email = `${username}@sa-hos.com`;
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      // ค้นหาผู้ใช้จาก Firestore ด้วย Username
+      const { collection, query, where, getDocs } = await import('firebase/firestore');
+      const usersRef = collection(db, 'users');
+      const q = query(usersRef, where('username', '==', username));
+      const querySnapshot = await getDocs(q);
       
-      // ตรวจสอบประเภทผู้ใช้จาก Firestore
-      const userDoc = await getDoc(doc(db, 'users', userCredential.user.uid));
-      if (userDoc.exists()) {
-        const userData = userDoc.data();
-        if (userData.role === 'admin') {
-          navigate('/admin');
-        } else {
-          navigate('/staff'); // หน้าสำหรับเจ้าหน้าที่ทั่วไป
-        }
-      } else {
-        // ถ้าไม่มีข้อมูลใน users collection ให้ไปหน้า admin (fallback)
-        navigate('/admin');
+      if (querySnapshot.empty) {
+        setError('ไม่พบผู้ใช้นี้ กรุณาตรวจสอบ Username');
+        setLoading(false);
+        return;
       }
+      
+      const userDoc = querySnapshot.docs[0];
+      const userData = userDoc.data();
+      
+      // ตรวจสอบรหัสผ่าน
+      if (userData.password !== password) {
+        setError('รหัสผ่านไม่ถูกต้อง');
+        setLoading(false);
+        return;
+      }
+      
+      // ล็อกอินสำเร็จ - สร้าง session หรือ redirect ไปยังหน้าที่เหมาะสม
+      console.log('Login successful:', userData);
+      
+      // เก็บข้อมูลผู้ใช้ใน localStorage หรือ sessionStorage
+      localStorage.setItem('currentUser', JSON.stringify({
+        id: userDoc.id,
+        username: userData.username,
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        role: userData.role,
+        department: userData.department,
+        position: userData.position
+      }));
+      
+      // Redirect ไปยังหน้าที่เหมาะสม
+      if (userData.role === 'admin') {
+        navigate('/admin');
+      } else {
+        navigate('/staff');
+      }
+      
     } catch (error) {
       console.error('Login error:', error);
-      if (error.code === 'auth/user-not-found') {
-        setError('ไม่พบผู้ใช้นี้ กรุณาตรวจสอบ Username');
-      } else if (error.code === 'auth/wrong-password') {
-        setError('รหัสผ่านไม่ถูกต้อง');
-      } else {
-        setError('เกิดข้อผิดพลาดในการเข้าสู่ระบบ');
-      }
+      setError('เกิดข้อผิดพลาดในการเข้าสู่ระบบ กรุณาลองใหม่อีกครั้ง');
     } finally {
       setLoading(false);
     }
@@ -129,14 +149,6 @@ function Login() {
               </span>
               <div className="btn-loading-spinner"></div>
             </button>
-
-            <div className="register-section">
-              <p className="register-text">ยังไม่มีบัญชี?</p>
-              <Link to="/register" className="register-btn-link">
-                <span>สมัครสมาชิก</span>
-                <div className="btn-arrow">→</div>
-              </Link>
-            </div>
           </form>
         </div>
       </div>
