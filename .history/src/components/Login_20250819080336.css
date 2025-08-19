@@ -424,9 +424,9 @@
 }
 
 .register-btn-link:hover {
-  background: #5a67d8;
+  background: rgba(255, 255, 255, 0.3);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 .btn-arrow {
