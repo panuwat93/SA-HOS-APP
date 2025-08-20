@@ -340,20 +340,6 @@ function OnCallSchedule({ user }) {
     }
 
     if (newHoliday.date && newHoliday.name) {
-      // ตรวจสอบว่าวันหยุดนี้มีอยู่แล้วหรือไม่
-      const existingHoliday = holidays.find(h => {
-        const existingDate = new Date(h.date);
-        const newDate = new Date(newHoliday.date);
-        return existingDate.getDate() === newDate.getDate() && 
-               existingDate.getMonth() === newDate.getMonth() && 
-               existingDate.getFullYear() === newDate.getFullYear();
-      });
-      
-      if (existingHoliday) {
-        showPopup('วันหยุดนี้มีอยู่แล้ว! กรุณาเลือกวันที่อื่น', 'warning');
-        return;
-      }
-
       try {
         const holiday = {
           id: `custom_${Date.now()}`,
@@ -641,70 +627,28 @@ function OnCallSchedule({ user }) {
 
               {/* ฟอร์มเพิ่มวันหยุด - แสดงเฉพาะแอดมิน */}
               {canEdit() && (
-                <div className="add-holiday-form" style={{
-                  marginTop: '20px',
-                  padding: '15px',
-                  backgroundColor: '#f8f9fa',
-                  borderRadius: '8px',
-                  border: '1px solid #e9ecef'
-                }}>
-                  <h4 style={{ margin: '0 0 15px 0', color: '#495057' }}>➕ เพิ่มวันหยุดใหม่</h4>
-                  <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'center' }}>
-                    <input
-                      type="date"
-                      value={newHoliday.date}
-                      onChange={(e) => setNewHoliday(prev => ({ ...prev, date: e.target.value }))}
-                      className="holiday-date-input"
-                      placeholder="เลือกวันที่"
-                      style={{
-                        padding: '8px 12px',
-                        border: '1px solid #ced4da',
-                        borderRadius: '6px',
-                        fontSize: '14px'
-                      }}
-                    />
-                    <input
-                      type="text"
-                      value={newHoliday.name}
-                      onChange={(e) => setNewHoliday(prev => ({ ...prev, name: e.target.value }))}
-                      className="holiday-name-input"
-                      placeholder="ชื่อวันหยุด"
-                      style={{
-                        padding: '8px 12px',
-                        border: '1px solid #ced4da',
-                        borderRadius: '6px',
-                        fontSize: '14px',
-                        minWidth: '200px'
-                      }}
-                    />
-                    <button
-                      onClick={addHoliday}
-                      className="btn btn-primary add-holiday-btn"
-                      disabled={!newHoliday.date || !newHoliday.name}
-                      style={{
-                        padding: '8px 16px',
-                        backgroundColor: '#28a745',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '6px',
-                        cursor: 'pointer',
-                        fontSize: '14px',
-                        opacity: (!newHoliday.date || !newHoliday.name) ? '0.6' : '1'
-                      }}
-                    >
-                      ➕ เพิ่ม
-                    </button>
-                  </div>
-                  {newHoliday.date && newHoliday.name && (
-                    <div style={{ 
-                      marginTop: '10px', 
-                      fontSize: '12px', 
-                      color: '#6c757d',
-                      fontStyle: 'italic' 
-                    }}>
-                      📅 จะเพิ่มวันหยุด: {new Date(newHoliday.date).getDate()}/{new Date(newHoliday.date).getMonth() + 1} - {newHoliday.name}
-                    </div>
-                  )}
+                <div className="add-holiday-form">
+                  <input
+                    type="date"
+                    value={newHoliday.date}
+                    onChange={(e) => setNewHoliday(prev => ({ ...prev, date: e.target.value }))}
+                    className="holiday-date-input"
+                    placeholder="เลือกวันที่"
+                  />
+                  <input
+                    type="text"
+                    value={newHoliday.name}
+                    onChange={(e) => setNewHoliday(prev => ({ ...prev, name: e.target.value }))}
+                    className="holiday-name-input"
+                    placeholder="ชื่อวันหยุด"
+                  />
+                  <button
+                    onClick={addHoliday}
+                    className="btn btn-primary add-holiday-btn"
+                    disabled={!newHoliday.date || !newHoliday.name}
+                  >
+                    ➕ เพิ่ม
+                  </button>
                 </div>
               )}
             </>

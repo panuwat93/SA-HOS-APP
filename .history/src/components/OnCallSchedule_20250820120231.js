@@ -340,15 +340,7 @@ function OnCallSchedule({ user }) {
     }
 
     if (newHoliday.date && newHoliday.name) {
-      // ตรวจสอบว่าวันหยุดนี้มีอยู่แล้วหรือไม่
-      const existingHoliday = holidays.find(h => {
-        const existingDate = new Date(h.date);
-        const newDate = new Date(newHoliday.date);
-        return existingDate.getDate() === newDate.getDate() && 
-               existingDate.getMonth() === newDate.getMonth() && 
-               existingDate.getFullYear() === newDate.getFullYear();
-      });
-      
+      const existingHoliday = holidays.find(h => new Date(h.date).getDate() === new Date(newHoliday.date).getDate() && new Date(h.date).getMonth() === new Date(newHoliday.date).getMonth());
       if (existingHoliday) {
         showPopup('วันหยุดนี้มีอยู่แล้ว! กรุณาเลือกวันที่อื่น', 'warning');
         return;
