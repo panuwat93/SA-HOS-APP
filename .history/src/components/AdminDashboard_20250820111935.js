@@ -19,7 +19,21 @@ function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
+  const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
 
+  // ปิด dropdown เมื่อคลิกข้างนอก
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (isUserDropdownOpen && !event.target.closest('.user-profile-dropdown')) {
+        setIsUserDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isUserDropdownOpen]);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (authUser) => {
@@ -156,9 +170,8 @@ function AdminDashboard() {
                 setIsMobileMenuOpen(false);
               }}
               className="nav-button"
-              title="เปลี่ยนรหัสผ่าน"
             >
-              ⚙️
+              🔐
             </button>
           </li>
           <li className="nav-item">
@@ -168,9 +181,8 @@ function AdminDashboard() {
                 setIsMobileMenuOpen(false);
               }} 
               className="nav-button logout"
-              title="ออกจากระบบ"
             >
-              ⎘
+              🚪
             </button>
           </li>
         </ul>

@@ -7,10 +7,10 @@ import ChangePasswordModal from './ChangePasswordModal';
 import StaffManagement from './StaffManagement';
 import ScheduleManagement from './ScheduleManagement';
 import PreExchangeSchedule from './PreExchangeSchedule';
-import OnCallSchedule from './OnCallSchedule';
 import './AdminDashboard.css';
 
 import TaskAssignment from './TaskAssignment';
+import OnCallSchedule from './OnCallSchedule';
 
 function AdminDashboard() {
   const [showChangePassword, setShowChangePassword] = useState(false);
@@ -19,7 +19,6 @@ function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
-
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (authUser) => {
@@ -156,21 +155,16 @@ function AdminDashboard() {
                 setIsMobileMenuOpen(false);
               }}
               className="nav-button"
-              title="เปลี่ยนรหัสผ่าน"
             >
-              ⚙️
+              🔐 เปลี่ยนรหัส
             </button>
           </li>
           <li className="nav-item">
-            <button 
-              onClick={() => {
-                handleLogout();
-                setIsMobileMenuOpen(false);
-              }} 
-              className="nav-button logout"
-              title="ออกจากระบบ"
-            >
-              ⎘
+            <button onClick={() => {
+              handleLogout();
+              setIsMobileMenuOpen(false);
+            }} className="nav-button logout">
+              🚪 ออกจากระบบ
             </button>
           </li>
         </ul>
@@ -179,10 +173,10 @@ function AdminDashboard() {
       <div className="container">
         <Routes>
           <Route path="/" element={<ScheduleManagement user={user} />} />
+          <Route path="/oncall" element={<OnCallSchedule user={user} />} />
           <Route path="/tasks" element={<TaskAssignment user={user} />} />
           <Route path="/staff" element={<StaffManagement />} />
           <Route path="/pre-exchange" element={<PreExchangeSchedule user={user} />} />
-          <Route path="/oncall" element={<OnCallSchedule user={user} />} />
         </Routes>
       </div>
 

@@ -87,56 +87,33 @@
   display: flex;
   justify-content: center;
   list-style: none;
-  gap: 8px; /* ลดจาก 12px เป็น 8px */
+  gap: 6px; /* ลดจาก 8px เป็น 6px */
   flex-wrap: nowrap;
   align-items: center;
-  max-width: 1400px; /* จำกัดความกว้าง */
+  max-width: 100%; /* เปลี่ยนจาก 1800px เป็น 100% */
   margin: 0 auto;
   padding: 0 20px;
-  overflow-x: auto; /* เปลี่ยนกลับเป็น auto เพื่อดูปัญหา */
-  /* เพิ่มการจัดการ overflow ที่ดีขึ้น */
-  scrollbar-width: thin;
-  scrollbar-color: #00A651 #f0f0f0;
-}
-
-/* ปรับแต่ง scrollbar สำหรับ Webkit browsers */
-.nav-list::-webkit-scrollbar {
-  height: 6px;
-}
-
-.nav-list::-webkit-scrollbar-track {
-  background: #f0f0f0;
-  border-radius: 3px;
-}
-
-.nav-list::-webkit-scrollbar-thumb {
-  background: #00A651;
-  border-radius: 3px;
-}
-
-.nav-list::-webkit-scrollbar-thumb:hover {
-  background: #008f45;
+  overflow-x: hidden; /* เปลี่ยนจาก auto เป็น hidden */
 }
 
 .nav-item {
   display: flex;
   align-items: center;
   flex-shrink: 0; /* ป้องกันการหดตัว */
-  min-width: 0; /* อนุญาตให้หดตัวได้เล็กน้อย */
 }
 
 .nav-item a {
   text-decoration: none;
   color: #2c3e50;
   font-weight: 500;
-  padding: 6px 12px; /* ลด padding เป็น 6px 12px */
+  padding: 6px 10px; /* ลด padding จาก 8px 12px เป็น 6px 10px */
   border-radius: 8px;
   transition: all 0.3s ease;
   white-space: nowrap;
   display: flex;
   align-items: center;
-  gap: 4px; /* ลด gap เป็น 4px */
-  font-size: 13px; /* ลดขนาดฟอนต์เป็น 13px */
+  gap: 3px; /* ลด gap จาก 4px เป็น 3px */
+  font-size: 12px; /* ลดขนาดฟอนต์จาก 13px เป็น 12px */
 }
 
 .nav-item a:hover {
@@ -199,16 +176,16 @@
   border: none;
   color: #2c3e50;
   font-weight: 500;
-  padding: 6px 12px; /* ลด padding ให้เท่ากับ nav-item a */
+  padding: 6px 10px; /* ลด padding ให้เท่ากับ nav-item a */
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.3s ease;
   font-family: 'Kanit', sans-serif;
-  font-size: 13px; /* ลดขนาดฟอนต์ให้เท่ากับ nav-item a */
+  font-size: 12px; /* ลดขนาดฟอนต์ให้เท่ากับ nav-item a */
   white-space: nowrap;
   display: flex;
   align-items: center;
-  gap: 4px; /* ลด gap ให้เท่ากับ nav-item a */
+  gap: 3px; /* ลด gap ให้เท่ากับ nav-item a */
   min-width: fit-content;
   flex-shrink: 0; /* ป้องกันการหดตัว */
 }
@@ -248,7 +225,126 @@
   font-family: 'Kanit', sans-serif;
 }
 
+/* User Profile Dropdown */
+.user-profile-dropdown {
+  position: relative;
+  display: inline-block;
+  z-index: 10000; /* เพิ่ม z-index ให้สูงขึ้น */
+}
 
+.user-profile-btn {
+  background: linear-gradient(135deg, #00A651 0%, #00B050 100%);
+  border: none;
+  color: white;
+  font-size: 18px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 166, 81, 0.3);
+  position: relative;
+  z-index: 10001; /* เพิ่ม z-index ให้สูงขึ้น */
+}
+
+.user-profile-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 166, 81, 0.4);
+}
+
+/* ปรับปรุงการแสดงผล dropdown */
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+  min-width: 200px;
+  z-index: 10002; /* เพิ่ม z-index ให้สูงขึ้น */
+  margin-top: 8px;
+  border: 1px solid #e9ecef;
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  transition: all 0.3s ease;
+  /* เพิ่มการป้องกันการซ้อนทับ */
+  pointer-events: auto;
+  overflow: hidden;
+  /* เพิ่มการตั้งค่าสำหรับการแสดงผล */
+  display: block;
+  min-height: 80px;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 12px 16px;
+  border: none;
+  background: none;
+  color: #2c3e50;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+  font-family: 'Kanit', sans-serif;
+}
+
+.dropdown-item:first-child {
+  border-radius: 8px 8px 0 0;
+}
+
+.dropdown-item:last-child {
+  border-radius: 0 0 8px 8px;
+}
+
+.dropdown-item:hover {
+  background: #f8f9fa;
+  color: #00A651;
+}
+
+.dropdown-item.logout {
+  color: #e74c3c;
+}
+
+.dropdown-item.logout:hover {
+  background: #fdf2f2;
+  color: #c0392b;
+}
+
+/* CSS สำหรับ dropdown ที่ถูกต้อง */
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+  min-width: 200px;
+  z-index: 10002;
+  margin-top: 8px;
+  border: 1px solid #e9ecef;
+  /* เริ่มต้นซ่อน dropdown */
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.3s ease;
+  pointer-events: none;
+}
+
+/* แสดง dropdown เมื่อมี class หรือ state */
+.user-profile-dropdown .dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  pointer-events: auto;
+}
 
 @media (max-width: 1200px) {
   .nav-list {
@@ -259,8 +355,8 @@
   
   .nav-item a,
   .nav-button {
-    padding: 6px 12px; /* ลด padding เล็กน้อย */
-    font-size: 12px; /* ลดขนาดฟอนต์เล็กน้อย */
+    padding: 8px 12px; /* ลด padding เล็กน้อย */
+    font-size: 13px; /* ลดขนาดฟอนต์เล็กน้อย */
   }
 }
 

@@ -87,56 +87,33 @@
   display: flex;
   justify-content: center;
   list-style: none;
-  gap: 8px; /* ลดจาก 12px เป็น 8px */
+  gap: 12px; /* เพิ่มจาก 6px เป็น 12px */
   flex-wrap: nowrap;
   align-items: center;
-  max-width: 1400px; /* จำกัดความกว้าง */
+  max-width: 100%; /* เปลี่ยนจาก 1800px เป็น 100% */
   margin: 0 auto;
   padding: 0 20px;
-  overflow-x: auto; /* เปลี่ยนกลับเป็น auto เพื่อดูปัญหา */
-  /* เพิ่มการจัดการ overflow ที่ดีขึ้น */
-  scrollbar-width: thin;
-  scrollbar-color: #00A651 #f0f0f0;
-}
-
-/* ปรับแต่ง scrollbar สำหรับ Webkit browsers */
-.nav-list::-webkit-scrollbar {
-  height: 6px;
-}
-
-.nav-list::-webkit-scrollbar-track {
-  background: #f0f0f0;
-  border-radius: 3px;
-}
-
-.nav-list::-webkit-scrollbar-thumb {
-  background: #00A651;
-  border-radius: 3px;
-}
-
-.nav-list::-webkit-scrollbar-thumb:hover {
-  background: #008f45;
+  overflow-x: hidden; /* เปลี่ยนจาก auto เป็น hidden */
 }
 
 .nav-item {
   display: flex;
   align-items: center;
   flex-shrink: 0; /* ป้องกันการหดตัว */
-  min-width: 0; /* อนุญาตให้หดตัวได้เล็กน้อย */
 }
 
 .nav-item a {
   text-decoration: none;
   color: #2c3e50;
   font-weight: 500;
-  padding: 6px 12px; /* ลด padding เป็น 6px 12px */
+  padding: 8px 16px; /* เพิ่ม padding เป็น 8px 16px */
   border-radius: 8px;
   transition: all 0.3s ease;
   white-space: nowrap;
   display: flex;
   align-items: center;
-  gap: 4px; /* ลด gap เป็น 4px */
-  font-size: 13px; /* ลดขนาดฟอนต์เป็น 13px */
+  gap: 6px; /* เพิ่ม gap เป็น 6px */
+  font-size: 14px; /* เพิ่มขนาดฟอนต์เป็น 14px */
 }
 
 .nav-item a:hover {
@@ -199,16 +176,16 @@
   border: none;
   color: #2c3e50;
   font-weight: 500;
-  padding: 6px 12px; /* ลด padding ให้เท่ากับ nav-item a */
+  padding: 8px 16px; /* เพิ่ม padding ให้เท่ากับ nav-item a */
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.3s ease;
   font-family: 'Kanit', sans-serif;
-  font-size: 13px; /* ลดขนาดฟอนต์ให้เท่ากับ nav-item a */
+  font-size: 14px; /* เพิ่มขนาดฟอนต์ให้เท่ากับ nav-item a */
   white-space: nowrap;
   display: flex;
   align-items: center;
-  gap: 4px; /* ลด gap ให้เท่ากับ nav-item a */
+  gap: 6px; /* เพิ่ม gap ให้เท่ากับ nav-item a */
   min-width: fit-content;
   flex-shrink: 0; /* ป้องกันการหดตัว */
 }

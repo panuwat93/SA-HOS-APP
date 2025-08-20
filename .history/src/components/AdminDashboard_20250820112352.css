@@ -94,28 +94,6 @@
   margin: 0 auto;
   padding: 0 20px;
   overflow-x: auto; /* เปลี่ยนกลับเป็น auto เพื่อดูปัญหา */
-  /* เพิ่มการจัดการ overflow ที่ดีขึ้น */
-  scrollbar-width: thin;
-  scrollbar-color: #00A651 #f0f0f0;
-}
-
-/* ปรับแต่ง scrollbar สำหรับ Webkit browsers */
-.nav-list::-webkit-scrollbar {
-  height: 6px;
-}
-
-.nav-list::-webkit-scrollbar-track {
-  background: #f0f0f0;
-  border-radius: 3px;
-}
-
-.nav-list::-webkit-scrollbar-thumb {
-  background: #00A651;
-  border-radius: 3px;
-}
-
-.nav-list::-webkit-scrollbar-thumb:hover {
-  background: #008f45;
 }
 
 .nav-item {

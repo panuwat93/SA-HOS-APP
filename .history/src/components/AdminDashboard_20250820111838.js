@@ -19,7 +19,21 @@ function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
+  const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
 
+  // ปิด dropdown เมื่อคลิกข้างนอก
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (isUserDropdownOpen && !event.target.closest('.user-profile-dropdown')) {
+        setIsUserDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isUserDropdownOpen]);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (authUser) => {
@@ -150,28 +164,38 @@ function AdminDashboard() {
             </Link>
           </li>
           <li className="nav-item">
-            <button 
-              onClick={() => {
-                setShowChangePassword(true);
-                setIsMobileMenuOpen(false);
-              }}
-              className="nav-button"
-              title="เปลี่ยนรหัสผ่าน"
-            >
-              ⚙️
-            </button>
-          </li>
-          <li className="nav-item">
-            <button 
-              onClick={() => {
-                handleLogout();
-                setIsMobileMenuOpen(false);
-              }} 
-              className="nav-button logout"
-              title="ออกจากระบบ"
-            >
-              ⎘
-            </button>
+            <div className="user-profile-dropdown">
+              <button 
+                className="user-profile-btn"
+                onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}
+              >
+                👤
+              </button>
+              {isUserDropdownOpen && (
+                <div className="dropdown-menu">
+                  <button 
+                    onClick={() => {
+                      setShowChangePassword(true);
+                      setIsUserDropdownOpen(false);
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="dropdown-item"
+                  >
+                    ⚙️ เปลี่ยนรหัสผ่าน
+                  </button>
+                  <button 
+                    onClick={() => {
+                      handleLogout();
+                      setIsUserDropdownOpen(false);
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="dropdown-item logout"
+                  >
+                    ⎘ ออกจากระบบ
+                  </button>
+                </div>
+              )}
+            </div>
           </li>
         </ul>
       </div>

@@ -6,7 +6,6 @@ import { auth, db } from '../firebase';
 import ScheduleManagement from './ScheduleManagement';
 import TaskAssignment from './TaskAssignment';
 import PreExchangeSchedule from './PreExchangeSchedule';
-import OnCallSchedule from './OnCallSchedule';
 import StaffCalendar from './StaffCalendar';
 import ChangePasswordModal from './ChangePasswordModal';
 import './StaffDashboard.css';

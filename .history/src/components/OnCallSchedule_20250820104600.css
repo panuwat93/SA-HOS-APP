@@ -1,0 +1,339 @@
+/* OnCallSchedule Styles */
+.oncall-schedule {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.oncall-schedule h2 {
+  font-size: 2.5rem;
+  margin-bottom: 16px;
+  color: #2c3e50;
+  text-align: center;
+}
+
+.oncall-schedule p {
+  font-size: 1.2rem;
+  color: #7f8c8d;
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+/* แถบควบคุม */
+.schedule-controls {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 30px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+/* การนำทางเดือน */
+.month-navigation {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.month-nav-btn {
+  background: linear-gradient(135deg, #00A651 0%, #00B050 100%);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  font-family: 'Kanit', sans-serif;
+}
+
+.month-nav-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 166, 81, 0.3);
+}
+
+.current-month {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin: 0;
+  min-width: 200px;
+  text-align: center;
+}
+
+/* ปุ่มดำเนินการ */
+.action-buttons {
+  display: flex;
+  gap: 15px;
+}
+
+.btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  font-family: 'Kanit', sans-serif;
+}
+
+.btn-info {
+  background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+  color: white;
+}
+
+.btn-info:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #00A651 0%, #00B050 100%);
+  color: white;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 166, 81, 0.3);
+}
+
+/* ตาราง On call */
+.oncall-table-container {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  overflow-x: auto;
+}
+
+.oncall-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 600px;
+}
+
+.oncall-table th {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  color: #2c3e50;
+  padding: 15px 10px;
+  text-align: center;
+  font-weight: 600;
+  border: 1px solid #dee2e6;
+  font-size: 14px;
+}
+
+.oncall-table td {
+  padding: 12px 10px;
+  border: 1px solid #dee2e6;
+  text-align: center;
+  vertical-align: middle;
+}
+
+/* หัวตาราง */
+.day-header {
+  background: linear-gradient(135deg, #00A651 0%, #00B050 100%) !important;
+  color: white !important;
+  font-weight: 700 !important;
+}
+
+.primary-header {
+  background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%) !important;
+  color: white !important;
+}
+
+.secondary-header {
+  background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%) !important;
+  color: white !important;
+}
+
+.backup-header {
+  background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%) !important;
+  color: white !important;
+}
+
+/* แถวตาราง */
+.even-row {
+  background-color: #f8f9fa;
+}
+
+.odd-row {
+  background-color: white;
+}
+
+.even-row:hover,
+.odd-row:hover {
+  background-color: #e8f5e8;
+}
+
+/* เซลล์วันที่ */
+.day-cell {
+  font-weight: 600;
+  color: #2c3e50;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  min-width: 80px;
+}
+
+/* Dropdown เลือกเจ้าหน้าที่ */
+.staff-select {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  font-size: 14px;
+  background: white;
+  color: #2c3e50;
+  cursor: pointer;
+  transition: border-color 0.3s ease;
+}
+
+.staff-select:focus {
+  outline: none;
+  border-color: #00A651;
+  box-shadow: 0 0 0 3px rgba(0, 166, 81, 0.1);
+}
+
+.staff-select:hover {
+  border-color: #00A651;
+}
+
+/* Popup แจ้งเตือน */
+.popup {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  animation: slideInRight 0.3s ease-out;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.popup-content {
+  background: white;
+  border-radius: 8px;
+  padding: 15px 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  min-width: 300px;
+}
+
+.popup.success .popup-content {
+  border-left: 4px solid #00A651;
+}
+
+.popup.error .popup-content {
+  border-left: 4px solid #e74c3c;
+}
+
+.popup-message {
+  flex: 1;
+  color: #2c3e50;
+  font-weight: 500;
+}
+
+.popup-close {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #95a5a6;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.popup-close:hover {
+  background: #f8f9fa;
+  color: #2c3e50;
+}
+
+/* Loading Spinner */
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  font-size: 1.2rem;
+  color: #6c757d;
+  font-family: 'Kanit', sans-serif;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .schedule-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .month-navigation {
+    justify-content: center;
+  }
+  
+  .action-buttons {
+    justify-content: center;
+  }
+  
+  .oncall-table-container {
+    padding: 15px;
+  }
+  
+  .oncall-table th,
+  .oncall-table td {
+    padding: 8px 6px;
+    font-size: 13px;
+  }
+  
+  .current-month {
+    font-size: 1.2rem;
+    min-width: auto;
+  }
+  
+  .month-nav-btn {
+    padding: 8px 16px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .oncall-schedule {
+    padding: 15px;
+  }
+  
+  .oncall-schedule h2 {
+    font-size: 2rem;
+  }
+  
+  .oncall-schedule p {
+    font-size: 1rem;
+  }
+  
+  .popup {
+    top: 10px;
+    right: 10px;
+    left: 10px;
+  }
+  
+  .popup-content {
+    min-width: auto;
+  }
+}

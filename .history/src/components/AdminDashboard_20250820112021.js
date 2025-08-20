@@ -156,9 +156,8 @@ function AdminDashboard() {
                 setIsMobileMenuOpen(false);
               }}
               className="nav-button"
-              title="เปลี่ยนรหัสผ่าน"
             >
-              ⚙️
+              🔐
             </button>
           </li>
           <li className="nav-item">
@@ -168,9 +167,8 @@ function AdminDashboard() {
                 setIsMobileMenuOpen(false);
               }} 
               className="nav-button logout"
-              title="ออกจากระบบ"
             >
-              ⎘
+              🚪
             </button>
           </li>
         </ul>

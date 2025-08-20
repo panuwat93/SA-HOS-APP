@@ -6,7 +6,6 @@ import { auth, db } from '../firebase';
 import ScheduleManagement from './ScheduleManagement';
 import TaskAssignment from './TaskAssignment';
 import PreExchangeSchedule from './PreExchangeSchedule';
-import OnCallSchedule from './OnCallSchedule';
 import StaffCalendar from './StaffCalendar';
 import ChangePasswordModal from './ChangePasswordModal';
 import './StaffDashboard.css';
@@ -273,7 +272,6 @@ function StaffDashboard() {
           <Route path="/" element={<ScheduleManagement user={user} />} />
           <Route path="/tasks" element={<TaskAssignment user={user} />} />
           <Route path="/pre-exchange-schedule" element={<PreExchangeSchedule user={user} />} />
-          <Route path="/oncall" element={<OnCallSchedule user={user} />} />
           <Route path="/calendar" element={<StaffCalendar user={user} />} />
         </Routes>
       </div>
