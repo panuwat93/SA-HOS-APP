@@ -235,9 +235,9 @@ function StaffCalendar({ user }) {
     });
     
     if (shifts.length > 0) {
-      // แสดงเวรทั้งหมดที่เจอในบรรทัดเดียวกัน
+      // แสดงเวรทั้งหมดที่เจอ
       return (
-        <div className="shifts-container" style={{ display: 'flex', gap: '2px', justifyContent: 'center' }}>
+        <div className="shifts-container">
           {shifts.map((shift, index) => {
             // ใช้ข้อความจริงจากตารางเวร
             let shiftText = shift.text;
@@ -285,8 +285,7 @@ function StaffCalendar({ user }) {
                   fontSize: '12px',
                   fontWeight: 'bold',
                   border: '1px solid #ddd',
-                  minWidth: '20px',
-                  textAlign: 'center'
+                  marginBottom: index < shifts.length - 1 ? '2px' : '0' // เว้นระยะระหว่างเวร
                 }}
                 title={`เวร: ${shift.text}${shift.color ? ` (สี: ${shift.color})` : ''}`}
               >
