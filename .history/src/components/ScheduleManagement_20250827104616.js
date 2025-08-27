@@ -2910,16 +2910,9 @@ function ScheduleManagement({ user }) {
       });
       
       // แสดง popup แจ้งเตือน
-      let shiftName = shiftType;
-      if (shiftType === 'ช') shiftName = 'เช้า';
-      else if (shiftType === 'บ') shiftName = 'บ่าย';
-      else if (shiftType === 'ด') shiftName = 'ดึก';
-      else if (shiftType === 'VA') shiftName = 'VA';
-      else if (shiftType === 'O') shiftName = 'O';
-      
+      const shiftName = shiftType === 'ช' ? 'เช้า' : shiftType === 'บ' ? 'บ่าย' : 'ดึก';
       const colorName = color === '#000000' ? 'ดำ' : 'แดง';
-      const bgInfo = backgroundColor !== 'transparent' ? ` พื้น${backgroundColor === '#FF0000' ? 'แดง' : backgroundColor}` : '';
-      showPopup(`ใส่เวร${shiftName}สี${colorName}${bgInfo} ใน ${selectedCells.length} ช่องเรียบร้อยแล้ว`, 'success');
+      showPopup(`ใส่เวร${shiftName}สี${colorName} ใน ${selectedCells.length} ช่องเรียบร้อยแล้ว`, 'success');
       
       // ล้างการเลือกช่อง
       setSelectedCells([]);

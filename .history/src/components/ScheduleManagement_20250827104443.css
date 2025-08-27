@@ -1692,14 +1692,13 @@ tr.staff-row-bottom {
 }
 
 /* ปุ่มเวร VA */
-.shift-btn.va-red-bg {
-  background: #FF0000;
-  color: #000000;
-  box-shadow: 0 2px 8px rgba(255, 0, 0, 0.3);
+.shift-btn.va-black {
+  background: #000000;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
-.shift-btn.va-red-bg:hover {
-  box-shadow: 0 4px 15px rgba(255, 0, 0, 0.4);
+.shift-btn.va-black:hover {
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
 }
 
 /* ปุ่มเวร O */

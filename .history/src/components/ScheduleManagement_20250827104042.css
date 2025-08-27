@@ -1691,27 +1691,6 @@ tr.staff-row-bottom {
   box-shadow: 0 4px 15px rgba(255, 0, 0, 0.4);
 }
 
-/* ปุ่มเวร VA */
-.shift-btn.va-red-bg {
-  background: #FF0000;
-  color: #000000;
-  box-shadow: 0 2px 8px rgba(255, 0, 0, 0.3);
-}
-
-.shift-btn.va-red-bg:hover {
-  box-shadow: 0 4px 15px rgba(255, 0, 0, 0.4);
-}
-
-/* ปุ่มเวร O */
-.shift-btn.o-red {
-  background: #FF0000;
-  box-shadow: 0 2px 8px rgba(255, 0, 0, 0.3);
-}
-
-.shift-btn.o-red:hover {
-  box-shadow: 0 4px 15px rgba(255, 0, 0, 0.4);
-}
-
 .toolbar-info {
   flex: 1;
   text-align: right;

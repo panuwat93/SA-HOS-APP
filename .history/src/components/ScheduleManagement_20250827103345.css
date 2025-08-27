@@ -1691,27 +1691,6 @@ tr.staff-row-bottom {
   box-shadow: 0 4px 15px rgba(255, 0, 0, 0.4);
 }
 
-/* ปุ่มเวร VA */
-.shift-btn.va-red-bg {
-  background: #FF0000;
-  color: #000000;
-  box-shadow: 0 2px 8px rgba(255, 0, 0, 0.3);
-}
-
-.shift-btn.va-red-bg:hover {
-  box-shadow: 0 4px 15px rgba(255, 0, 0, 0.4);
-}
-
-/* ปุ่มเวร O */
-.shift-btn.o-red {
-  background: #FF0000;
-  box-shadow: 0 2px 8px rgba(255, 0, 0, 0.3);
-}
-
-.shift-btn.o-red:hover {
-  box-shadow: 0 4px 15px rgba(255, 0, 0, 0.4);
-}
-
 .toolbar-info {
   flex: 1;
   text-align: right;
@@ -2372,5 +2351,113 @@ tr.staff-row-bottom {
   to {
     transform: translateX(0);
     opacity: 1;
+  }
+}
+
+/* Landscape Mode Support for Schedule Management */
+@media (orientation: landscape) and (max-height: 600px) {
+  .controls-container {
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 15px;
+    padding: 0 15px;
+  }
+  
+  .leave-request-modal {
+    height: 95vh;
+    width: 98vw;
+  }
+  
+  .leave-request-modal .modal-header {
+    padding: 20px 25px;
+  }
+  
+  .leave-request-modal .modal-header h3 {
+    font-size: 1.4rem;
+  }
+  
+  .leave-request-modal .modal-content {
+    padding: 20px 25px;
+  }
+  
+  .schedule-table {
+    font-size: 12px;
+  }
+  
+  .schedule-table th,
+  .schedule-table td {
+    padding: 6px 8px;
+  }
+  
+  .btn {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+}
+
+/* Mobile Landscape for Schedule Management */
+@media (max-width: 767px) and (orientation: landscape) {
+  .controls-container {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin-bottom: 10px;
+    padding: 0 10px;
+  }
+  
+  .leave-request-modal {
+    height: 98vh;
+    width: 98vw;
+  }
+  
+  .leave-request-modal .modal-header {
+    padding: 15px 20px;
+  }
+  
+  .leave-request-modal .modal-header h3 {
+    font-size: 1.2rem;
+  }
+  
+  .leave-request-modal .modal-content {
+    padding: 15px 20px;
+  }
+  
+  .schedule-table {
+    font-size: 11px;
+  }
+  
+  .schedule-table th,
+  .schedule-table td {
+    padding: 4px 6px;
+  }
+  
+  .btn {
+    padding: 5px 10px;
+    font-size: 11px;
+  }
+}
+
+/* Tablet Landscape for Schedule Management */
+@media (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
+  .controls-container {
+    gap: 18px;
+    margin-bottom: 18px;
+    padding: 0 18px;
+  }
+  
+  .leave-request-modal {
+    height: 92vh;
+    width: 96vw;
+  }
+  
+  .leave-request-modal .modal-header {
+    padding: 22px 28px;
+  }
+  
+  .leave-request-modal .modal-header h3 {
+    font-size: 1.5rem;
+  }
+  
+  .leave-request-modal .modal-content {
+    padding: 25px 28px;
   }
 }

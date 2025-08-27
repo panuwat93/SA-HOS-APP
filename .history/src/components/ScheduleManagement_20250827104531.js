@@ -2874,7 +2874,7 @@ function ScheduleManagement({ user }) {
   };
 
   // ฟังก์ชันใส่เวรในช่องที่เลือก
-  const insertShiftToSelectedCells = (shiftType, color, backgroundColor = 'transparent') => {
+  const insertShiftToSelectedCells = (shiftType, color) => {
     if (selectedCells.length === 0) {
       showPopup('กรุณาเลือกช่องที่ต้องการใส่เวรก่อน', 'warning');
       return;
@@ -2898,7 +2898,7 @@ function ScheduleManagement({ user }) {
               text: shiftType,
               color: color,
               fontSize: textFormat.fontSize,
-              backgroundColor: backgroundColor
+              backgroundColor: 'transparent'
             };
             
             // บันทึกเวรในรูปแบบ JSON string
@@ -2910,16 +2910,9 @@ function ScheduleManagement({ user }) {
       });
       
       // แสดง popup แจ้งเตือน
-      let shiftName = shiftType;
-      if (shiftType === 'ช') shiftName = 'เช้า';
-      else if (shiftType === 'บ') shiftName = 'บ่าย';
-      else if (shiftType === 'ด') shiftName = 'ดึก';
-      else if (shiftType === 'VA') shiftName = 'VA';
-      else if (shiftType === 'O') shiftName = 'O';
-      
+      const shiftName = shiftType === 'ช' ? 'เช้า' : shiftType === 'บ' ? 'บ่าย' : 'ดึก';
       const colorName = color === '#000000' ? 'ดำ' : 'แดง';
-      const bgInfo = backgroundColor !== 'transparent' ? ` พื้น${backgroundColor === '#FF0000' ? 'แดง' : backgroundColor}` : '';
-      showPopup(`ใส่เวร${shiftName}สี${colorName}${bgInfo} ใน ${selectedCells.length} ช่องเรียบร้อยแล้ว`, 'success');
+      showPopup(`ใส่เวร${shiftName}สี${colorName} ใน ${selectedCells.length} ช่องเรียบร้อยแล้ว`, 'success');
       
       // ล้างการเลือกช่อง
       setSelectedCells([]);
@@ -3271,22 +3264,6 @@ function ScheduleManagement({ user }) {
               >
                 ด
               </button>
-              <button
-                onClick={() => user?.canEditSchedule ? insertShiftToSelectedCells('VA', '#000000', '#FF0000') : null}
-                className="format-btn shift-btn va-red-bg"
-                title="ใส่เวร VA ตัวอักษรดำ พื้นแดง"
-                disabled={!user?.canEditSchedule || selectedCells.length === 0}
-              >
-                VA
-              </button>
-              <button
-                onClick={() => user?.canEditSchedule ? insertShiftToSelectedCells('O', '#FF0000') : null}
-                className="format-btn shift-btn o-red"
-                title="ใส่เวร O สีแดง"
-                disabled={!user?.canEditSchedule || selectedCells.length === 0}
-              >
-                O
-              </button>
             </div>
             
             <div className="toolbar-info">
@@ -3398,22 +3375,6 @@ function ScheduleManagement({ user }) {
                 disabled={!user?.canEditSchedule || selectedCells.length === 0}
               >
                 ด
-              </button>
-              <button
-                onClick={() => user?.canEditSchedule ? insertShiftToSelectedCells('VA', '#000000', '#FF0000') : null}
-                className="format-btn shift-btn va-red-bg"
-                title="ใส่เวร VA ตัวอักษรดำ พื้นแดง"
-                disabled={!user?.canEditSchedule || selectedCells.length === 0}
-              >
-                VA
-              </button>
-              <button
-                onClick={() => user?.canEditSchedule ? insertShiftToSelectedCells('O', '#FF0000') : null}
-                className="format-btn shift-btn o-red"
-                title="ใส่เวร O สีแดง"
-                disabled={!user?.canEditSchedule || selectedCells.length === 0}
-              >
-                O
               </button>
             </div>
             

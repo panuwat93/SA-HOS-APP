@@ -1,0 +1,554 @@
+/* OnCallSchedule.css */
+.oncall-schedule {
+  padding: 20px;
+  font-family: 'Kanit', sans-serif;
+}
+
+.oncall-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 20px;
+  background: linear-gradient(135deg, #A5D6A7 0%, #81C784 100%);
+  border-radius: 12px;
+  color: white;
+}
+
+.oncall-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.oncall-controls {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.month-selector {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.month-selector select {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 500;
+  background: white;
+  color: #2c3e50;
+}
+
+.oncall-table-container {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  overflow-x: auto;
+  margin-bottom: 20px;
+}
+
+.oncall-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 800px;
+}
+
+.oncall-table th,
+.oncall-table td {
+  border: 1px solid #e1e8ed;
+  padding: 12px 8px;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.oncall-table th {
+  background: #f8f9fa;
+  font-weight: 600;
+  color: #2c3e50;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.oncall-table td {
+  background: white;
+  transition: background-color 0.2s ease;
+}
+
+.oncall-table td:hover {
+  background: #f8f9fa;
+}
+
+.staff-name {
+  font-weight: 600;
+  color: #2c3e50;
+  text-align: left;
+  padding-left: 15px;
+  position: sticky;
+  left: 0;
+  background: white;
+  z-index: 5;
+}
+
+.staff-name:hover {
+  background: #f8f9fa !important;
+}
+
+.cell-input {
+  width: 100%;
+  padding: 8px;
+  border: 2px solid transparent;
+  border-radius: 4px;
+  text-align: center;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  background: transparent;
+}
+
+.cell-input:focus {
+  outline: none;
+  border-color: #00A651;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(0, 166, 81, 0.1);
+}
+
+.cell-input:hover {
+  background: rgba(0, 166, 81, 0.05);
+}
+
+.holiday-cell {
+  background: #fff3cd !important;
+  color: #856404;
+  font-weight: 500;
+}
+
+.holiday-cell input {
+  background: transparent;
+  color: #856404;
+  font-weight: 500;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-family: 'Kanit', sans-serif;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
+  font-size: 16px;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #00A651 0%, #00B050 100%);
+  color: white;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 166, 81, 0.3);
+}
+
+.btn-secondary {
+  background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+  color: white;
+}
+
+.btn-secondary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(108, 117, 125, 0.3);
+}
+
+.btn-success {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  color: white;
+}
+
+.btn-success:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(40, 167, 69, 0.3);
+}
+
+.btn-warning {
+  background: linear-gradient(135deg, #ffc107 0%, #ffb300 100%);
+  color: #212529;
+}
+
+.btn-warning:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(255, 193, 7, 0.3);
+}
+
+.btn-danger {
+  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+  color: white;
+}
+
+.btn-danger:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(220, 53, 69, 0.3);
+}
+
+.draft-indicator {
+  background: linear-gradient(135deg, #ffc107 0%, #ffb300 100%);
+  color: #212529;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 15px;
+}
+
+.draft-indicator::before {
+  content: '📝';
+  font-size: 16px;
+}
+
+.text-format-controls {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.format-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.format-group label {
+  font-weight: 500;
+  color: #2c3e50;
+  font-size: 14px;
+}
+
+.format-group input {
+  padding: 6px 10px;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.color-picker {
+  width: 40px;
+  height: 35px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .oncall-schedule {
+    padding: 15px;
+  }
+  
+  .oncall-header {
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+    padding: 15px;
+  }
+  
+  .oncall-title {
+    font-size: 1.8rem;
+  }
+  
+  .oncall-controls {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .month-selector {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .oncall-table {
+    min-width: 600px;
+    font-size: 14px;
+  }
+  
+  .oncall-table th,
+  .oncall-table td {
+    padding: 8px 6px;
+  }
+  
+  .cell-input {
+    padding: 6px;
+    font-size: 13px;
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .btn {
+    width: 100%;
+    padding: 10px 20px;
+  }
+  
+  .text-format-controls {
+    flex-direction: column;
+    gap: 10px;
+    align-items: stretch;
+  }
+  
+  .format-group {
+    justify-content: space-between;
+  }
+}
+
+@media (max-width: 480px) {
+  .oncall-schedule {
+    padding: 10px;
+  }
+  
+  .oncall-header {
+    padding: 12px;
+  }
+  
+  .oncall-title {
+    font-size: 1.6rem;
+  }
+  
+  .oncall-table {
+    min-width: 500px;
+    font-size: 13px;
+  }
+  
+  .oncall-table th,
+  .oncall-table td {
+    padding: 6px 4px;
+  }
+  
+  .cell-input {
+    padding: 4px;
+    font-size: 12px;
+  }
+  
+  .btn {
+    padding: 8px 16px;
+    font-size: 14px;
+  }
+}
+
+/* Landscape Mode Support for OnCall Schedule */
+@media (orientation: landscape) and (max-height: 600px) {
+  .oncall-schedule {
+    padding: 15px;
+  }
+  
+  .oncall-header {
+    padding: 15px 20px;
+    margin-bottom: 15px;
+  }
+  
+  .oncall-title {
+    font-size: 1.8rem;
+  }
+  
+  .oncall-controls {
+    gap: 12px;
+  }
+  
+  .month-selector select {
+    padding: 6px 10px;
+    font-size: 14px;
+  }
+  
+  .oncall-table {
+    font-size: 13px;
+  }
+  
+  .oncall-table th,
+  .oncall-table td {
+    padding: 8px 6px;
+  }
+  
+  .cell-input {
+    padding: 6px;
+    font-size: 12px;
+  }
+  
+  .action-buttons {
+    gap: 12px;
+    margin-top: 15px;
+  }
+  
+  .btn {
+    padding: 8px 16px;
+    font-size: 14px;
+  }
+  
+  .text-format-controls {
+    padding: 12px;
+    margin-bottom: 15px;
+  }
+  
+  .format-group label {
+    font-size: 13px;
+  }
+  
+  .format-group input {
+    padding: 5px 8px;
+    font-size: 13px;
+  }
+}
+
+/* Mobile Landscape for OnCall Schedule */
+@media (max-width: 767px) and (orientation: landscape) {
+  .oncall-schedule {
+    padding: 10px;
+  }
+  
+  .oncall-header {
+    flex-direction: row;
+    gap: 20px;
+    padding: 12px 15px;
+    margin-bottom: 12px;
+  }
+  
+  .oncall-title {
+    font-size: 1.6rem;
+  }
+  
+  .oncall-controls {
+    flex-direction: row;
+    gap: 15px;
+  }
+  
+  .month-selector {
+    flex-direction: row;
+    gap: 10px;
+  }
+  
+  .oncall-table {
+    min-width: 700px;
+    font-size: 12px;
+  }
+  
+  .oncall-table th,
+  .oncall-table td {
+    padding: 6px 4px;
+  }
+  
+  .cell-input {
+    padding: 4px;
+    font-size: 11px;
+  }
+  
+  .action-buttons {
+    flex-direction: row;
+    gap: 10px;
+    margin-top: 12px;
+  }
+  
+  .btn {
+    padding: 6px 12px;
+    font-size: 13px;
+    width: auto;
+  }
+  
+  .text-format-controls {
+    flex-direction: row;
+    gap: 12px;
+    padding: 10px;
+    margin-bottom: 12px;
+  }
+  
+  .format-group {
+    gap: 6px;
+  }
+  
+  .format-group label {
+    font-size: 12px;
+  }
+  
+  .format-group input {
+    padding: 4px 6px;
+    font-size: 12px;
+  }
+  
+  .color-picker {
+    width: 35px;
+    height: 30px;
+  }
+}
+
+/* Tablet Landscape for OnCall Schedule */
+@media (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
+  .oncall-schedule {
+    padding: 18px;
+  }
+  
+  .oncall-header {
+    padding: 18px 25px;
+    margin-bottom: 18px;
+  }
+  
+  .oncall-title {
+    font-size: 1.9rem;
+  }
+  
+  .oncall-controls {
+    gap: 18px;
+  }
+  
+  .month-selector select {
+    padding: 9px 14px;
+    font-size: 15px;
+  }
+  
+  .oncall-table {
+    font-size: 14px;
+  }
+  
+  .oncall-table th,
+  .oncall-table td {
+    padding: 10px 7px;
+  }
+  
+  .cell-input {
+    padding: 7px;
+    font-size: 13px;
+  }
+  
+  .action-buttons {
+    gap: 18px;
+    margin-top: 18px;
+  }
+  
+  .btn {
+    padding: 10px 20px;
+    font-size: 15px;
+  }
+  
+  .text-format-controls {
+    padding: 15px;
+    margin-bottom: 18px;
+  }
+}

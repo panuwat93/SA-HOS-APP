@@ -1,0 +1,433 @@
+.admin-dashboard {
+  min-height: 100vh;
+}
+
+/* Header Styles */
+.header {
+  background: linear-gradient(135deg, #00A651 0%, #00B050 100%);
+  color: white;
+  padding: 2rem 0;
+  text-align: center;
+}
+
+.header h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  letter-spacing: 2px;
+}
+
+.header p {
+  font-size: 1.1rem;
+  margin: 0.5rem 0 0 0;
+  opacity: 0.9;
+  font-weight: 400;
+}
+
+/* ปรับปรุงการจัดวางเมนู */
+.nav-menu {
+  background: white;
+  padding: 20px 0;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+/* แฮมเบอร์เกอร์เมนู */
+.mobile-menu-toggle {
+  display: none;
+  cursor: pointer;
+  padding: 10px;
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 1001;
+}
+
+.hamburger {
+  display: block;
+  width: 25px;
+  height: 3px;
+  background: #00A651;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.hamburger::before,
+.hamburger::after {
+  content: '';
+  position: absolute;
+  width: 25px;
+  height: 3px;
+  background: #00A651;
+  transition: all 0.3s ease;
+}
+
+.hamburger::before {
+  transform: translateY(-8px);
+}
+
+.hamburger::after {
+  transform: translateY(8px);
+}
+
+.hamburger.active {
+  background: transparent;
+}
+
+.hamburger.active::before {
+  transform: rotate(45deg);
+}
+
+.hamburger.active::after {
+  transform: rotate(-45deg);
+}
+
+.nav-list {
+  display: flex;
+  justify-content: center;
+  list-style: none;
+  gap: 8px; /* ลดจาก 12px เป็น 8px */
+  flex-wrap: nowrap;
+  align-items: center;
+  max-width: 1400px; /* จำกัดความกว้าง */
+  margin: 0 auto;
+  padding: 0 20px;
+  overflow-x: auto; /* เปลี่ยนกลับเป็น auto เพื่อดูปัญหา */
+  /* เพิ่มการจัดการ overflow ที่ดีขึ้น */
+  scrollbar-width: thin;
+  scrollbar-color: #00A651 #f0f0f0;
+}
+
+/* ปรับแต่ง scrollbar สำหรับ Webkit browsers */
+.nav-list::-webkit-scrollbar {
+  height: 6px;
+}
+
+.nav-list::-webkit-scrollbar-track {
+  background: #f0f0f0;
+  border-radius: 3px;
+}
+
+.nav-list::-webkit-scrollbar-thumb {
+  background: #00A651;
+  border-radius: 3px;
+}
+
+.nav-list::-webkit-scrollbar-thumb:hover {
+  background: #008f45;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0; /* ป้องกันการหดตัว */
+  min-width: 0; /* อนุญาตให้หดตัวได้เล็กน้อย */
+}
+
+.nav-item a {
+  text-decoration: none;
+  color: #2c3e50;
+  font-weight: 500;
+  padding: 6px 12px; /* ลด padding เป็น 6px 12px */
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 4px; /* ลด gap เป็น 4px */
+  font-size: 13px; /* ลดขนาดฟอนต์เป็น 13px */
+}
+
+.nav-item a:hover {
+  background: linear-gradient(135deg, #00A651 0%, #00B050 100%);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 166, 81, 0.3);
+}
+
+.nav-item a.active {
+  background: linear-gradient(135deg, #00A651 0%, #00B050 100%);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 166, 81, 0.3);
+  font-weight: 600;
+}
+
+.dashboard-content {
+  padding: 40px 0;
+}
+
+.dashboard-content h2 {
+  font-size: 2.5rem;
+  margin-bottom: 16px;
+  color: #2c3e50;
+  text-align: center;
+}
+
+.dashboard-content p {
+  font-size: 1.2rem;
+  color: #7f8c8d;
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.placeholder-content {
+  background: white;
+  border-radius: 16px;
+  padding: 60px 40px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.placeholder-content p {
+  font-size: 1.1rem;
+  color: #95a5a6;
+  margin-bottom: 16px;
+}
+
+.placeholder-content p:first-child {
+  font-size: 1.5rem;
+  color: #f39c12;
+  font-weight: 600;
+}
+
+.nav-button {
+  background: none;
+  border: none;
+  color: #2c3e50;
+  font-weight: 500;
+  padding: 6px 12px; /* ลด padding ให้เท่ากับ nav-item a */
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Kanit', sans-serif;
+  font-size: 13px; /* ลดขนาดฟอนต์ให้เท่ากับ nav-item a */
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 4px; /* ลด gap ให้เท่ากับ nav-item a */
+  min-width: fit-content;
+  flex-shrink: 0; /* ป้องกันการหดตัว */
+}
+
+.nav-button:hover {
+  background: linear-gradient(135deg, #00A651 0%, #00B050 100%);
+  color: white;
+  transform: translateY(-2px);
+}
+
+.nav-button.logout {
+  color: #e74c3c;
+}
+
+.nav-button.print {
+  color: #27ae60;
+}
+
+.nav-button.print:hover {
+  background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+  color: white;
+}
+
+.nav-button.logout:hover {
+  background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+  color: white;
+}
+
+/* Loading Spinner */
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  font-size: 1.2rem;
+  color: #6c757d;
+  font-family: 'Kanit', sans-serif;
+}
+
+
+
+@media (max-width: 1200px) {
+  .nav-list {
+    max-width: 100%;
+    gap: 10px; /* ลด gap เล็กน้อย */
+    padding: 0 15px;
+  }
+  
+  .nav-item a,
+  .nav-button {
+    padding: 6px 12px; /* ลด padding เล็กน้อย */
+    font-size: 12px; /* ลดขนาดฟอนต์เล็กน้อย */
+  }
+}
+
+@media (max-width: 768px) {
+  /* แสดงแฮมเบอร์เกอร์เมนู */
+  .mobile-menu-toggle {
+    display: block;
+  }
+  
+  /* ซ่อนเมนูหลัก */
+  .nav-list {
+    position: fixed;
+    top: 0;
+    left: -100%;
+    width: 280px;
+    height: 100vh;
+    background: white;
+    flex-direction: column;
+    gap: 0;
+    align-items: stretch;
+    padding: 80px 0 20px 0;
+    box-shadow: 2px 0 20px rgba(0, 0, 0, 0.1);
+    transition: left 0.3s ease;
+    z-index: 1000;
+    overflow-y: auto;
+    overflow-x: hidden; /* ซ่อน scroll แนวนอน */
+  }
+  
+  .nav-list.mobile-open {
+    left: 0;
+  }
+  
+  .nav-item {
+    border-bottom: 1px solid #f0f0f0;
+  }
+  
+  .nav-item a,
+  .nav-button {
+    padding: 20px 25px;
+    font-size: 18px;
+    width: 100%;
+    justify-content: flex-start;
+    border-radius: 0;
+    border-left: 4px solid transparent;
+    transition: all 0.3s ease;
+  }
+  
+  .nav-item a:hover,
+  .nav-button:hover {
+    background: #f8f9fa;
+    border-left-color: #00A651;
+    transform: none;
+  }
+  
+  .dashboard-content h2 {
+    font-size: 2rem;
+  }
+  
+  .placeholder-content {
+    padding: 40px 20px;
+    margin: 0 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .nav-list {
+    width: 100%;
+    left: -100%;
+  }
+  
+  .nav-item a,
+  .nav-button {
+    font-size: 16px;
+    padding: 18px 20px;
+  }
+  
+  .mobile-menu-toggle {
+    top: 15px;
+    right: 15px;
+  }
+}
+
+/* Landscape Mode Support for Admin Dashboard */
+@media (orientation: landscape) and (max-height: 600px) {
+  .header {
+    padding: 1.5rem 0;
+  }
+  
+  .header h1 {
+    font-size: 2rem;
+  }
+  
+  .header p {
+    font-size: 1rem;
+  }
+  
+  .nav-menu {
+    padding: 15px 0;
+  }
+  
+  .nav-list {
+    gap: 6px;
+  }
+  
+  .nav-item a,
+  .nav-button {
+    padding: 4px 10px;
+    font-size: 11px;
+  }
+  
+  .dashboard-content {
+    padding: 20px;
+  }
+  
+  .dashboard-content h2 {
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+  }
+  
+  .placeholder-content {
+    padding: 20px;
+    margin: 0 15px;
+  }
+}
+
+/* Mobile Landscape for Admin Dashboard */
+@media (max-width: 767px) and (orientation: landscape) {
+  .mobile-menu-toggle {
+    top: 10px;
+    right: 10px;
+  }
+  
+  .nav-list {
+    width: 250px;
+    padding: 60px 0 15px 0;
+  }
+  
+  .nav-item a,
+  .nav-button {
+    padding: 15px 20px;
+    font-size: 16px;
+  }
+  
+  .dashboard-content {
+    padding: 15px;
+  }
+  
+  .placeholder-content {
+    padding: 20px 15px;
+    margin: 0 10px;
+  }
+}
+
+/* Tablet Landscape for Admin Dashboard */
+@media (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
+  .nav-list {
+    gap: 8px;
+    max-width: 1200px;
+  }
+  
+  .nav-item a,
+  .nav-button {
+    padding: 5px 12px;
+    font-size: 12px;
+  }
+  
+  .dashboard-content {
+    padding: 25px;
+  }
+}
