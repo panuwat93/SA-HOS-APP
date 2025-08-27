@@ -1204,10 +1204,16 @@ function ScheduleManagement({ user }) {
       description: `พิมพ์ "${value}" ในช่อง ${day}`
     };
     
-          console.log('🔍 Storing cell input history:', actionData);
-      
-      // เพิ่มการกระทำลงในประวัติ (รองรับ 5 ครั้ง)
-      addToActionHistory(actionData);
+    console.log('🔍 Storing cell input history:', actionData);
+    setLastAction(actionData);
+    
+    // เก็บประวัติใน localStorage
+    try {
+      localStorage.setItem('lastAction', JSON.stringify(actionData));
+      console.log('🔍 Saved cell input to localStorage:', actionData);
+    } catch (error) {
+      console.error('🔍 Error saving cell input to localStorage:', error);
+    }
   };
 
   // ฟังก์ชันจัดการการจัดรูปแบบข้อความ
@@ -2940,43 +2946,20 @@ function ScheduleManagement({ user }) {
     setOtDistributionMode('all');
   };
 
-  // ฟังก์ชันเพิ่มการกระทำลงในประวัติ
-  const addToActionHistory = (action) => {
-    setActionHistory(prev => {
-      const newHistory = [action, ...prev.slice(0, 4)]; // เก็บแค่ 5 ครั้งล่าสุด
-      console.log('🔍 Updated action history:', newHistory);
-      return newHistory;
-    });
-    
-    // อัปเดต lastAction เพื่อความเข้ากันได้
-    setLastAction(action);
-    
-    // เก็บใน localStorage
-    try {
-      localStorage.setItem('actionHistory', JSON.stringify([action, ...actionHistory.slice(0, 4)]));
-      localStorage.setItem('lastAction', JSON.stringify(action));
-      console.log('🔍 Saved to localStorage:', { actionHistory: [action, ...actionHistory.slice(0, 4)], lastAction: action });
-    } catch (error) {
-      console.error('🔍 Error saving to localStorage:', error);
-    }
-  };
-
-  // ฟังก์ชัน Undo แบบ 5 ครั้ง
+  // ฟังก์ชัน Undo แบบง่าย (ย้อนกลับการกระทำล่าสุด)
   const undoLastAction = () => {
     console.log('🔍 Undo clicked!');
-    console.log('🔍 actionHistory:', actionHistory);
+    console.log('🔍 lastAction:', lastAction);
     console.log('🔍 user?.canEditSchedule:', user?.canEditSchedule);
     
-    if (actionHistory.length > 0 && user?.canEditSchedule) {
+    if (lastAction && user?.canEditSchedule) {
       console.log('🔍 Executing undo...');
-      const actionToUndo = actionHistory[0]; // การกระทำล่าสุด
-      
       setScheduleData(prev => {
         const newData = { ...prev };
         
         // ย้อนกลับการกระทำล่าสุด
-        if (actionToUndo.type === 'insertShift' || actionToUndo.type === 'cellInput') {
-          actionToUndo.cells.forEach(cell => {
+        if (lastAction.type === 'insertShift' || lastAction.type === 'cellInput') {
+          lastAction.cells.forEach(cell => {
             if (newData[cell.day]) {
               newData[cell.day][cell.staffId] = cell.originalValue;
             }
@@ -2986,39 +2969,15 @@ function ScheduleManagement({ user }) {
         return newData;
       });
       
-      // ลบการกระทำล่าสุดออกจากประวัติ
-      setActionHistory(prev => {
-        const newHistory = prev.slice(1);
-        console.log('🔍 Removed action from history:', actionToUndo);
-        console.log('🔍 Remaining actions:', newHistory);
-        return newHistory;
-      });
-      
-      // อัปเดต lastAction
-      if (actionHistory.length > 1) {
-        setLastAction(actionHistory[1]);
-      } else {
-        setLastAction(null);
-      }
-      
-      // อัปเดต localStorage
-      try {
-        const newHistory = actionHistory.slice(1);
-        localStorage.setItem('actionHistory', JSON.stringify(newHistory));
-        if (newHistory.length > 0) {
-          localStorage.setItem('lastAction', JSON.stringify(newHistory[0]));
-        } else {
-          localStorage.removeItem('lastAction');
-        }
-      } catch (error) {
-        console.error('🔍 Error updating localStorage:', error);
-      }
+      // ล้างประวัติการกระทำ
+      setLastAction(null);
+      localStorage.removeItem('lastAction'); // ลบจาก localStorage
       
       // แสดง popup แจ้งเตือน
-      showPopup(`ย้อนกลับ: ${actionToUndo.description}`, 'success');
+      showPopup('ย้อนกลับการกระทำล่าสุดเรียบร้อยแล้ว', 'success');
     } else {
-      console.log('🔍 Cannot undo:', { hasHistory: actionHistory.length > 0, canEdit: !!user?.canEditSchedule });
-      if (actionHistory.length === 0) {
+      console.log('🔍 Cannot undo:', { lastAction: !!lastAction, canEdit: !!user?.canEditSchedule });
+      if (!lastAction) {
         showPopup('ไม่มีประวัติการกระทำล่าสุด', 'warning');
       } else if (!user?.canEditSchedule) {
         showPopup('คุณไม่มีสิทธิ์แก้ไขตารางเวร', 'error');
@@ -3098,9 +3057,15 @@ function ScheduleManagement({ user }) {
       console.log('🔍 Storing action history:', actionData);
       console.log('🔍 Original values:', originalValues);
       console.log('🔍 Selected cells:', selectedCells);
+      setLastAction(actionData);
       
-      // เพิ่มการกระทำลงในประวัติ (รองรับ 5 ครั้ง)
-      addToActionHistory(actionData);
+      // เก็บประวัติใน localStorage เพื่อป้องกันการสูญหายเมื่อรีเฟรช
+      try {
+        localStorage.setItem('lastAction', JSON.stringify(actionData));
+        console.log('🔍 Saved to localStorage:', actionData);
+      } catch (error) {
+        console.error('🔍 Error saving to localStorage:', error);
+      }
       
       // แสดง popup แจ้งเตือน
       let shiftName = shiftType;
@@ -3489,10 +3454,15 @@ function ScheduleManagement({ user }) {
                 onClick={undoLastAction}
                 className="format-btn undo-btn"
                 title="ย้อนกลับการกระทำล่าสุด"
-                disabled={!user?.canEditSchedule || actionHistory.length === 0}
+                disabled={!user?.canEditSchedule || !lastAction}
               >
-                ↩️ ย้อนกลับ ({actionHistory.length}/5)
+                ↩️ ย้อนกลับ
               </button>
+              {/* Debug info */}
+              <div style={{fontSize: '10px', color: '#666', marginTop: '5px'}}>
+                Debug: canEdit={user?.canEditSchedule ? 'true' : 'false'}, 
+                hasAction={lastAction ? 'true' : 'false'}
+              </div>
             </div>
             
             <div className="toolbar-info">
@@ -3630,10 +3600,15 @@ function ScheduleManagement({ user }) {
                 onClick={undoLastAction}
                 className="format-btn undo-btn"
                 title="ย้อนกลับการกระทำล่าสุด"
-                disabled={!user?.canEditSchedule || actionHistory.length === 0}
+                disabled={!user?.canEditSchedule || !lastAction}
               >
-                ↩️ ย้อนกลับ ({actionHistory.length}/5)
+                ↩️ ย้อนกลับ
               </button>
+              {/* Debug info */}
+              <div style={{fontSize: '10px', color: '#666', marginTop: '5px'}}>
+                Debug: canEdit={user?.canEditSchedule ? 'true' : 'false'}, 
+                hasAction={lastAction ? 'true' : 'false'}
+              </div>
             </div>
             
             <div className="toolbar-info">

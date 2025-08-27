@@ -48,26 +48,11 @@ function ScheduleManagement({ user }) {
   // โหลดประวัติการกระทำจาก localStorage เมื่อ component โหลด
   useEffect(() => {
     try {
-      // โหลด actionHistory
-      const savedHistory = localStorage.getItem('actionHistory');
-      if (savedHistory) {
-        const parsedHistory = JSON.parse(savedHistory);
-        console.log('🔍 Loaded actionHistory from localStorage:', parsedHistory);
-        setActionHistory(parsedHistory);
-        
-        // อัปเดต lastAction จาก actionHistory
-        if (parsedHistory.length > 0) {
-          setLastAction(parsedHistory[0]);
-        }
-      }
-      
-      // โหลด lastAction (เพื่อความเข้ากันได้)
       const savedAction = localStorage.getItem('lastAction');
-      if (savedAction && !savedHistory) {
+      if (savedAction) {
         const parsedAction = JSON.parse(savedAction);
-        console.log('🔍 Loaded lastAction from localStorage:', parsedAction);
+        console.log('🔍 Loaded from localStorage:', parsedAction);
         setLastAction(parsedAction);
-        setActionHistory([parsedAction]);
       }
     } catch (error) {
       console.error('🔍 Error loading from localStorage:', error);
@@ -1204,10 +1189,10 @@ function ScheduleManagement({ user }) {
       description: `พิมพ์ "${value}" ในช่อง ${day}`
     };
     
-          console.log('🔍 Storing cell input history:', actionData);
-      
-      // เพิ่มการกระทำลงในประวัติ (รองรับ 5 ครั้ง)
-      addToActionHistory(actionData);
+    console.log('🔍 Storing cell input history:', actionData);
+    
+    // เพิ่มการกระทำลงในประวัติ (รองรับ 5 ครั้ง)
+    addToActionHistory(actionData);
   };
 
   // ฟังก์ชันจัดการการจัดรูปแบบข้อความ
@@ -3489,10 +3474,15 @@ function ScheduleManagement({ user }) {
                 onClick={undoLastAction}
                 className="format-btn undo-btn"
                 title="ย้อนกลับการกระทำล่าสุด"
-                disabled={!user?.canEditSchedule || actionHistory.length === 0}
+                disabled={!user?.canEditSchedule || !lastAction}
               >
-                ↩️ ย้อนกลับ ({actionHistory.length}/5)
+                ↩️ ย้อนกลับ
               </button>
+              {/* Debug info */}
+              <div style={{fontSize: '10px', color: '#666', marginTop: '5px'}}>
+                Debug: canEdit={user?.canEditSchedule ? 'true' : 'false'}, 
+                hasAction={lastAction ? 'true' : 'false'}
+              </div>
             </div>
             
             <div className="toolbar-info">
@@ -3630,10 +3620,15 @@ function ScheduleManagement({ user }) {
                 onClick={undoLastAction}
                 className="format-btn undo-btn"
                 title="ย้อนกลับการกระทำล่าสุด"
-                disabled={!user?.canEditSchedule || actionHistory.length === 0}
+                disabled={!user?.canEditSchedule || !lastAction}
               >
-                ↩️ ย้อนกลับ ({actionHistory.length}/5)
+                ↩️ ย้อนกลับ
               </button>
+              {/* Debug info */}
+              <div style={{fontSize: '10px', color: '#666', marginTop: '5px'}}>
+                Debug: canEdit={user?.canEditSchedule ? 'true' : 'false'}, 
+                hasAction={lastAction ? 'true' : 'false'}
+              </div>
             </div>
             
             <div className="toolbar-info">

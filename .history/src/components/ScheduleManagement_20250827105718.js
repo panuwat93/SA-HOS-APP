@@ -34,45 +34,10 @@ function ScheduleManagement({ user }) {
   const [selectedStaffForOT, setSelectedStaffForOT] = useState([]);
   const [otDistributionMode, setOtDistributionMode] = useState('all'); // 'all' หรือ 'selected'
 
-  // State สำหรับประวัติการกระทำ (Undo แบบ 5 ครั้ง)
+  // State สำหรับประวัติการกระทำ
   const [actionHistory, setActionHistory] = useState([]);
-  const [lastAction, setLastAction] = useState(null); // เก็บไว้เพื่อความเข้ากันได้
-
-  // Debug: แสดงข้อมูล user และ lastAction
-  useEffect(() => {
-    console.log('🔍 ScheduleManagement - User object:', user);
-    console.log('🔍 ScheduleManagement - User canEditSchedule:', user?.canEditSchedule);
-    console.log('🔍 ScheduleManagement - LastAction:', lastAction);
-  }, [user, lastAction]);
-
-  // โหลดประวัติการกระทำจาก localStorage เมื่อ component โหลด
-  useEffect(() => {
-    try {
-      // โหลด actionHistory
-      const savedHistory = localStorage.getItem('actionHistory');
-      if (savedHistory) {
-        const parsedHistory = JSON.parse(savedHistory);
-        console.log('🔍 Loaded actionHistory from localStorage:', parsedHistory);
-        setActionHistory(parsedHistory);
-        
-        // อัปเดต lastAction จาก actionHistory
-        if (parsedHistory.length > 0) {
-          setLastAction(parsedHistory[0]);
-        }
-      }
-      
-      // โหลด lastAction (เพื่อความเข้ากันได้)
-      const savedAction = localStorage.getItem('lastAction');
-      if (savedAction && !savedHistory) {
-        const parsedAction = JSON.parse(savedAction);
-        console.log('🔍 Loaded lastAction from localStorage:', parsedAction);
-        setLastAction(parsedAction);
-        setActionHistory([parsedAction]);
-      }
-    } catch (error) {
-      console.error('🔍 Error loading from localStorage:', error);
-    }
-  }, []);
+  const [currentActionIndex, setCurrentActionIndex] = useState(0);
+  const [maxHistorySize, setMaxHistorySize] = useState(10);
 
   // โหลดรายชื่อเจ้าหน้าที่
   useEffect(() => {
@@ -1174,40 +1139,18 @@ function ScheduleManagement({ user }) {
 
   // จัดการการพิมพ์ในช่อง
   const handleCellInput = (day, staffId, value) => {
-    console.log('🔍 🔍 🔍 handleCellInput CALLED!');
-    console.log('🔍 Parameters:', { day, staffId, value });
-    
-    // เก็บข้อมูลเดิมเพื่อประวัติ
-    const originalValue = scheduleData[day] && scheduleData[day][staffId] ? scheduleData[day][staffId] : '';
-    
     setScheduleData(prev => {
       // ใช้ auto-formatting สำหรับข้อความที่พิมพ์
       const formattedValue = autoFormatText(value);
       
       return {
-        ...prev,
-        [day]: {
-          ...prev[day],
+      ...prev,
+      [day]: {
+        ...prev[day],
           [staffId]: JSON.stringify(formattedValue)
         }
       };
     });
-    
-    // เก็บประวัติการกระทำล่าสุด
-    const actionData = {
-      type: 'cellInput',
-      cells: [{
-        day: day,
-        staffId: staffId,
-        originalValue: originalValue
-      }],
-      description: `พิมพ์ "${value}" ในช่อง ${day}`
-    };
-    
-          console.log('🔍 Storing cell input history:', actionData);
-      
-      // เพิ่มการกระทำลงในประวัติ (รองรับ 5 ครั้ง)
-      addToActionHistory(actionData);
   };
 
   // ฟังก์ชันจัดการการจัดรูปแบบข้อความ
@@ -1340,26 +1283,21 @@ function ScheduleManagement({ user }) {
 
   // คลิกช่องเพื่อเลือก
   const handleCellClick = (e, day, staffId) => {
-    console.log('🔍 🔍 🔍 handleCellClick CALLED!');
-    console.log('🔍 Parameters:', { day, staffId, ctrlKey: e.ctrlKey, metaKey: e.metaKey });
-    
     if (e.ctrlKey || e.metaKey) {
       // Ctrl+คลิก เพื่อเลือกหลายช่อง
-      console.log('🔍 Ctrl+Click - Multiple selection mode');
       setSelectedCells(prev => {
-        const newSelection = prev.find(cell => cell.day === day && cell.staffId === staffId)
-          ? prev.filter(cell => !(cell.day === day && cell.staffId === staffId))
-          : [...prev, { day, staffId }];
-        console.log('🔍 New selection (multiple):', newSelection);
-        return newSelection;
+        if (prev.find(cell => cell.day === day && cell.staffId === staffId)) {
+          // ถ้าช่องนี้ถูกเลือกอยู่แล้ว ให้ลบออก
+          return prev.filter(cell => !(cell.day === day && cell.staffId === staffId));
+        } else {
+          // เพิ่มช่องใหม่เข้าไป
+          return [...prev, { day, staffId }];
+        }
       });
       setSelectedCell({ day, staffId });
     } else {
       // คลิกปกติ เลือกช่องเดียว
-      console.log('🔍 Single click - Single selection mode');
-      const newSelection = [{ day, staffId }];
-      console.log('🔍 New selection (single):', newSelection);
-      setSelectedCells(newSelection);
+      setSelectedCells([{ day, staffId }]);
       setSelectedCell({ day, staffId });
     }
   };
@@ -2940,128 +2878,25 @@ function ScheduleManagement({ user }) {
     setOtDistributionMode('all');
   };
 
-  // ฟังก์ชันเพิ่มการกระทำลงในประวัติ
-  const addToActionHistory = (action) => {
-    setActionHistory(prev => {
-      const newHistory = [action, ...prev.slice(0, 4)]; // เก็บแค่ 5 ครั้งล่าสุด
-      console.log('🔍 Updated action history:', newHistory);
-      return newHistory;
-    });
-    
-    // อัปเดต lastAction เพื่อความเข้ากันได้
-    setLastAction(action);
-    
-    // เก็บใน localStorage
-    try {
-      localStorage.setItem('actionHistory', JSON.stringify([action, ...actionHistory.slice(0, 4)]));
-      localStorage.setItem('lastAction', JSON.stringify(action));
-      console.log('🔍 Saved to localStorage:', { actionHistory: [action, ...actionHistory.slice(0, 4)], lastAction: action });
-    } catch (error) {
-      console.error('🔍 Error saving to localStorage:', error);
-    }
-  };
-
-  // ฟังก์ชัน Undo แบบ 5 ครั้ง
-  const undoLastAction = () => {
-    console.log('🔍 Undo clicked!');
-    console.log('🔍 actionHistory:', actionHistory);
-    console.log('🔍 user?.canEditSchedule:', user?.canEditSchedule);
-    
-    if (actionHistory.length > 0 && user?.canEditSchedule) {
-      console.log('🔍 Executing undo...');
-      const actionToUndo = actionHistory[0]; // การกระทำล่าสุด
-      
-      setScheduleData(prev => {
-        const newData = { ...prev };
-        
-        // ย้อนกลับการกระทำล่าสุด
-        if (actionToUndo.type === 'insertShift' || actionToUndo.type === 'cellInput') {
-          actionToUndo.cells.forEach(cell => {
-            if (newData[cell.day]) {
-              newData[cell.day][cell.staffId] = cell.originalValue;
-            }
-          });
-        }
-        
-        return newData;
-      });
-      
-      // ลบการกระทำล่าสุดออกจากประวัติ
-      setActionHistory(prev => {
-        const newHistory = prev.slice(1);
-        console.log('🔍 Removed action from history:', actionToUndo);
-        console.log('🔍 Remaining actions:', newHistory);
-        return newHistory;
-      });
-      
-      // อัปเดต lastAction
-      if (actionHistory.length > 1) {
-        setLastAction(actionHistory[1]);
-      } else {
-        setLastAction(null);
-      }
-      
-      // อัปเดต localStorage
-      try {
-        const newHistory = actionHistory.slice(1);
-        localStorage.setItem('actionHistory', JSON.stringify(newHistory));
-        if (newHistory.length > 0) {
-          localStorage.setItem('lastAction', JSON.stringify(newHistory[0]));
-        } else {
-          localStorage.removeItem('lastAction');
-        }
-      } catch (error) {
-        console.error('🔍 Error updating localStorage:', error);
-      }
-      
-      // แสดง popup แจ้งเตือน
-      showPopup(`ย้อนกลับ: ${actionToUndo.description}`, 'success');
-    } else {
-      console.log('🔍 Cannot undo:', { hasHistory: actionHistory.length > 0, canEdit: !!user?.canEditSchedule });
-      if (actionHistory.length === 0) {
-        showPopup('ไม่มีประวัติการกระทำล่าสุด', 'warning');
-      } else if (!user?.canEditSchedule) {
-        showPopup('คุณไม่มีสิทธิ์แก้ไขตารางเวร', 'error');
-      }
-    }
-  };
-
   // ฟังก์ชันใส่เวรในช่องที่เลือก
   const insertShiftToSelectedCells = (shiftType, color, backgroundColor = 'transparent') => {
-    console.log('🔍 🔍 🔍 insertShiftToSelectedCells CALLED!');
-    console.log('🔍 Parameters:', { shiftType, color, backgroundColor });
-    console.log('🔍 selectedCells:', selectedCells);
-    console.log('🔍 user?.canEditSchedule:', user?.canEditSchedule);
-    
     if (selectedCells.length === 0) {
-      console.log('🔍 No cells selected, showing warning');
       showPopup('กรุณาเลือกช่องที่ต้องการใส่เวรก่อน', 'warning');
       return;
     }
 
     if (!user?.canEditSchedule) {
-      console.log('🔍 User cannot edit, showing error');
       showPopup('คุณไม่มีสิทธิ์แก้ไขตารางเวร', 'error');
       return;
     }
 
     try {
       // เก็บข้อมูลเดิมเพื่อประวัติ
-      const originalValues = [];
+      const originalValues = {};
       selectedCells.forEach(cell => {
         const { day, staffId } = cell;
         if (scheduleData[day] && scheduleData[day][staffId]) {
-          originalValues.push({
-            day: day,
-            staffId: staffId,
-            originalValue: scheduleData[day][staffId]
-          });
-        } else {
-          originalValues.push({
-            day: day,
-            staffId: staffId,
-            originalValue: ''
-          });
+          originalValues[`${day}-${staffId}`] = scheduleData[day][staffId];
         }
       });
 
@@ -3088,19 +2923,21 @@ function ScheduleManagement({ user }) {
         return newData;
       });
 
-      // เก็บประวัติการกระทำล่าสุด
-      const actionData = {
-        type: 'insertShift',
-        cells: originalValues,
-        description: `ใส่เวร${shiftType}ใน ${selectedCells.length} ช่อง`
-      };
-      
-      console.log('🔍 Storing action history:', actionData);
-      console.log('🔍 Original values:', originalValues);
-      console.log('🔍 Selected cells:', selectedCells);
-      
-      // เพิ่มการกระทำลงในประวัติ (รองรับ 5 ครั้ง)
-      addToActionHistory(actionData);
+      // เพิ่มประวัติการกระทำ
+      selectedCells.forEach(cell => {
+        const { day, staffId } = cell;
+        addToHistory({
+          type: 'insertShift',
+          day: day,
+          staffId: staffId,
+          shiftType: shiftType,
+          color: color,
+          fontSize: textFormat.fontSize,
+          backgroundColor: backgroundColor,
+          originalValue: originalValues[`${day}-${staffId}`] || '',
+          description: `ใส่เวร${shiftType}ในช่อง ${day}/${staffId}`
+        });
+      });
       
       // แสดง popup แจ้งเตือน
       let shiftName = shiftType;
@@ -3124,7 +2961,114 @@ function ScheduleManagement({ user }) {
     }
   };
 
+  // ฟังก์ชันเพิ่มประวัติการกระทำ
+  const addToHistory = (action) => {
+    const newAction = {
+      ...action,
+      timestamp: Date.now(),
+      id: Math.random().toString(36).substr(2, 9)
+    };
 
+    setActionHistory(prev => {
+      // ลบประวัติหลังจาก currentActionIndex (ถ้ามีการย้อนกลับ)
+      const newHistory = prev.slice(0, currentActionIndex + 1);
+      
+      // เพิ่มการกระทำใหม่
+      const updatedHistory = [...newHistory, newAction];
+      
+      // จำกัดขนาดประวัติ
+      if (updatedHistory.length > maxHistorySize) {
+        return updatedHistory.slice(-maxHistorySize);
+      }
+      
+      return updatedHistory;
+    });
+    
+    setCurrentActionIndex(prev => prev + 1);
+  };
+
+  // ฟังก์ชัน Undo (ย้อนกลับ)
+  const undoAction = () => {
+    if (currentActionIndex >= 0) {
+      const action = actionHistory[currentActionIndex];
+      
+      // ย้อนกลับการกระทำ
+      if (action.type === 'insertShift') {
+        setScheduleData(prev => {
+          const newData = { ...prev };
+          if (newData[action.day] && newData[action.day][action.staffId]) {
+            // เก็บข้อมูลเดิมไว้
+            const originalValue = action.originalValue || '';
+            newData[action.day][action.staffId] = originalValue;
+          }
+          return newData;
+        });
+      } else if (action.type === 'editCell') {
+        setScheduleData(prev => {
+          const newData = { ...prev };
+          if (newData[action.day] && newData[action.day][action.staffId]) {
+            newData[action.day][action.staffId] = action.originalValue;
+          }
+          return newData;
+        });
+      } else if (action.type === 'deleteCell') {
+        setScheduleData(prev => {
+          const newData = { ...prev };
+          if (newData[action.day] && newData[action.day][action.staffId]) {
+            newData[action.day][action.staffId] = action.originalValue;
+          }
+          return newData;
+        });
+      }
+      
+      setCurrentActionIndex(prev => prev - 1);
+      showPopup(`ย้อนกลับ: ${action.description}`, 'info');
+    }
+  };
+
+  // ฟังก์ชัน Redo (ทำซ้ำ)
+  const redoAction = () => {
+    if (currentActionIndex < actionHistory.length - 1) {
+      const nextActionIndex = currentActionIndex + 1;
+      const action = actionHistory[nextActionIndex];
+      
+      // ทำซ้ำการกระทำ
+      if (action.type === 'insertShift') {
+        setScheduleData(prev => {
+          const newData = { ...prev };
+          if (newData[action.day]) {
+            const newShift = {
+              text: action.shiftType,
+              color: action.color,
+              fontSize: action.fontSize,
+              backgroundColor: action.backgroundColor
+            };
+            newData[action.day][action.staffId] = JSON.stringify(newShift);
+          }
+          return newData;
+        });
+      } else if (action.type === 'editCell') {
+        setScheduleData(prev => {
+          const newData = { ...prev };
+          if (newData[action.day] && newData[action.day][action.staffId]) {
+            newData[action.day][action.staffId] = action.newValue;
+          }
+          return newData;
+        });
+      } else if (action.type === 'deleteCell') {
+        setScheduleData(prev => {
+          const newData = { ...prev };
+          if (newData[action.day] && newData[action.day][action.staffId]) {
+            delete newData[action.day][action.staffId];
+          }
+          return newData;
+        });
+      }
+      
+      setCurrentActionIndex(nextActionIndex);
+      showPopup(`ทำซ้ำ: ${action.description}`, 'info');
+    }
+  };
 
   return (
     <div className="dashboard-content">
@@ -3482,16 +3426,45 @@ function ScheduleManagement({ user }) {
               </button>
             </div>
             
-            {/* ปุ่ม Undo */}
+            {/* ปุ่ม Undo/Redo */}
             <div className="toolbar-section">
               <span className="toolbar-label">ประวัติ:</span>
               <button
-                onClick={undoLastAction}
+                onClick={undoAction}
                 className="format-btn undo-btn"
-                title="ย้อนกลับการกระทำล่าสุด"
-                disabled={!user?.canEditSchedule || actionHistory.length === 0}
+                title="ย้อนกลับ (Ctrl+Z)"
+                disabled={!user?.canEditSchedule || currentActionIndex < 0}
               >
-                ↩️ ย้อนกลับ ({actionHistory.length}/5)
+                ↩️ ย้อนกลับ
+              </button>
+              <button
+                onClick={redoAction}
+                className="format-btn redo-btn"
+                title="ทำซ้ำ (Ctrl+Y)"
+                disabled={!user?.canEditSchedule || currentActionIndex >= actionHistory.length - 1}
+              >
+                ↪️ ทำซ้ำ
+              </button>
+            </div>
+            
+            {/* ปุ่ม Undo/Redo */}
+            <div className="toolbar-section">
+              <span className="toolbar-label">ประวัติ:</span>
+              <button
+                onClick={undoAction}
+                className="format-btn undo-btn"
+                title="ย้อนกลับ (Ctrl+Z)"
+                disabled={!user?.canEditSchedule || currentActionIndex < 0}
+              >
+                ↩️ ย้อนกลับ
+              </button>
+              <button
+                onClick={redoAction}
+                className="format-btn redo-btn"
+                title="ทำซ้ำ (Ctrl+Y)"
+                disabled={!user?.canEditSchedule || currentActionIndex >= actionHistory.length - 1}
+              >
+                ↪️ ทำซ้ำ
               </button>
             </div>
             
@@ -3620,19 +3593,6 @@ function ScheduleManagement({ user }) {
                 disabled={!user?.canEditSchedule || selectedCells.length === 0}
               >
                 O
-              </button>
-            </div>
-            
-            {/* ปุ่ม Undo */}
-            <div className="toolbar-section">
-              <span className="toolbar-label">ประวัติ:</span>
-              <button
-                onClick={undoLastAction}
-                className="format-btn undo-btn"
-                title="ย้อนกลับการกระทำล่าสุด"
-                disabled={!user?.canEditSchedule || actionHistory.length === 0}
-              >
-                ↩️ ย้อนกลับ ({actionHistory.length}/5)
               </button>
             </div>
             

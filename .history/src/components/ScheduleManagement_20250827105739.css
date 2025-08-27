@@ -1712,23 +1712,6 @@ tr.staff-row-bottom {
   box-shadow: 0 4px 15px rgba(255, 0, 0, 0.4);
 }
 
-/* ปุ่ม Undo */
-.undo-btn {
-  background: #6c757d;
-  color: white;
-  box-shadow: 0 2px 8px rgba(108, 117, 125, 0.3);
-}
-
-.undo-btn:hover {
-  background: #5a6268;
-  box-shadow: 0 4px 15px rgba(108, 117, 125, 0.4);
-}
-
-.undo-btn:disabled {
-  background: #adb5bd;
-  cursor: not-allowed;
-}
-
 /* ปุ่ม Undo/Redo */
 .undo-btn {
   background: #6c757d;

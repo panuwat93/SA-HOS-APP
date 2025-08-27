@@ -3489,10 +3489,15 @@ function ScheduleManagement({ user }) {
                 onClick={undoLastAction}
                 className="format-btn undo-btn"
                 title="ย้อนกลับการกระทำล่าสุด"
-                disabled={!user?.canEditSchedule || actionHistory.length === 0}
+                disabled={!user?.canEditSchedule || !lastAction}
               >
-                ↩️ ย้อนกลับ ({actionHistory.length}/5)
+                ↩️ ย้อนกลับ
               </button>
+              {/* Debug info */}
+              <div style={{fontSize: '10px', color: '#666', marginTop: '5px'}}>
+                Debug: canEdit={user?.canEditSchedule ? 'true' : 'false'}, 
+                hasAction={lastAction ? 'true' : 'false'}
+              </div>
             </div>
             
             <div className="toolbar-info">
@@ -3630,10 +3635,15 @@ function ScheduleManagement({ user }) {
                 onClick={undoLastAction}
                 className="format-btn undo-btn"
                 title="ย้อนกลับการกระทำล่าสุด"
-                disabled={!user?.canEditSchedule || actionHistory.length === 0}
+                disabled={!user?.canEditSchedule || !lastAction}
               >
-                ↩️ ย้อนกลับ ({actionHistory.length}/5)
+                ↩️ ย้อนกลับ
               </button>
+              {/* Debug info */}
+              <div style={{fontSize: '10px', color: '#666', marginTop: '5px'}}>
+                Debug: canEdit={user?.canEditSchedule ? 'true' : 'false'}, 
+                hasAction={lastAction ? 'true' : 'false'}
+              </div>
             </div>
             
             <div className="toolbar-info">
