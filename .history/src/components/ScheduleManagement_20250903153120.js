@@ -3196,40 +3196,11 @@ function ScheduleManagement({ user }) {
                 onChange={(e) => setCurrentMonth(parseInt(e.target.value))}
                 className="month-dropdown"
               >
-                {user?.role === 'admin' ? (
-                  // Admin เห็นทุกเดือน
-                  Array.from({ length: 12 }, (_, i) => (
-                    <option key={i} value={i}>
-                      {getMonthNameByIndex(i)}
-                    </option>
-                  ))
-                ) : (
-                  // Staff เห็นแค่ย้อนหลัง 1 เดือน และล่วงหน้า 1 เดือน
-                  Array.from({ length: 12 }, (_, i) => {
-                    const currentDate = new Date();
-                    const currentMonthIndex = currentDate.getMonth();
-                    const currentYear = currentDate.getFullYear();
-                    
-                    // คำนวณเดือนที่อนุญาต (ย้อนหลัง 1 เดือน และล่วงหน้า 1 เดือน)
-                    const allowedMonths = [];
-                    for (let j = -1; j <= 1; j++) {
-                      const monthIndex = (currentMonthIndex + j + 12) % 12;
-                      const year = currentYear + Math.floor((currentMonthIndex + j) / 12);
-                      if (year === currentYear) {
-                        allowedMonths.push(monthIndex);
-                      }
-                    }
-                    
-                    if (allowedMonths.includes(i)) {
-                      return (
-                        <option key={i} value={i}>
-                          {getMonthNameByIndex(i)}
-                        </option>
-                      );
-                    }
-                    return null;
-                  }).filter(Boolean)
-                )}
+                {Array.from({ length: 12 }, (_, i) => (
+                  <option key={i} value={i}>
+                    {getMonthNameByIndex(i)}
+                  </option>
+                ))}
               </select>
             </div>
             <div className="year-selector">
@@ -3240,22 +3211,14 @@ function ScheduleManagement({ user }) {
                 onChange={(e) => setCurrentYear(parseInt(e.target.value))}
                 className="year-dropdown"
               >
-                {user?.role === 'admin' ? (
-                  // Admin เห็นทุกปี
-                  Array.from({ length: 21 }, (_, i) => {
-                    const year = currentYear - 10 + i;
-                    return (
-                      <option key={year} value={year}>
-                        {year}
-                      </option>
-                    );
-                  })
-                ) : (
-                  // Staff เห็นแค่ปีปัจจุบัน
-                  <option value={new Date().getFullYear()}>
-                    {new Date().getFullYear()}
-                  </option>
-                )}
+                {Array.from({ length: 21 }, (_, i) => {
+                  const year = currentYear - 10 + i;
+                  return (
+                    <option key={year} value={year}>
+                      {year}
+                    </option>
+                  );
+                })}
               </select>
             </div>
           </div>

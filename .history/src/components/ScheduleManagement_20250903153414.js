@@ -3240,22 +3240,14 @@ function ScheduleManagement({ user }) {
                 onChange={(e) => setCurrentYear(parseInt(e.target.value))}
                 className="year-dropdown"
               >
-                {user?.role === 'admin' ? (
-                  // Admin เห็นทุกปี
-                  Array.from({ length: 21 }, (_, i) => {
-                    const year = currentYear - 10 + i;
-                    return (
-                      <option key={year} value={year}>
-                        {year}
-                      </option>
-                    );
-                  })
-                ) : (
-                  // Staff เห็นแค่ปีปัจจุบัน
-                  <option value={new Date().getFullYear()}>
-                    {new Date().getFullYear()}
-                  </option>
-                )}
+                {Array.from({ length: 21 }, (_, i) => {
+                  const year = currentYear - 10 + i;
+                  return (
+                    <option key={year} value={year}>
+                      {year}
+                    </option>
+                  );
+                })}
               </select>
             </div>
           </div>

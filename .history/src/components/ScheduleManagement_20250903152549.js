@@ -1015,9 +1015,48 @@ function ScheduleManagement({ user }) {
         }
       }
       
-      // รวมข้อมูลจากทั้ง 2 ที่ (draft จะทับ published)
-      const mergedShifts = { ...publishedShifts, ...draftShifts };
+      // รวมข้อมูลจากทั้ง 2 ที่
+      // Admin: เห็นทั้งตารางเวรที่เผยแพร่แล้ว + ร่าง
+      // Staff: เห็นตารางเวรที่เผยแพร่แล้ว + เฉพาะเวรที่ตัวเองบันทึกในร่าง
+      let mergedShifts = { ...publishedShifts };
+      
+      if (user?.role === 'admin') {
+        // Admin เห็นร่างทั้งหมด
+        mergedShifts = { ...publishedShifts, ...draftShifts };
+      } else {
+        // Staff เห็นเฉพาะเวรที่ตัวเองบันทึกในร่าง
+        if (Object.keys(draftShifts).length > 0) {
+          // กรองเฉพาะเวรที่ Staff คนนี้บันทึก
+          const staffShifts = {};
+          Object.keys(draftShifts).forEach(day => {
+            if (draftShifts[day]) {
+              staffShifts[day] = {};
+              Object.keys(draftShifts[day]).forEach(staffId => {
+                // ตรวจสอบว่าเวรนี้เป็นของ Staff คนนี้หรือไม่
+                const shiftData = draftShifts[day][staffId];
+                if (shiftData && typeof shiftData === 'string') {
+                  try {
+                    const parsedShift = JSON.parse(shiftData);
+                    // ถ้าเวรนี้มีข้อมูลที่ Staff บันทึก ให้แสดง
+                    if (parsedShift && parsedShift.text) {
+                      staffShifts[day][staffId] = shiftData;
+                    }
+                  } catch (e) {
+                    // ถ้าไม่ใช่ JSON string ให้แสดงตามปกติ
+                    if (shiftData.trim() !== '') {
+                      staffShifts[day][staffId] = shiftData;
+                    }
+                  }
+                }
+              });
+            }
+          });
+          mergedShifts = { ...publishedShifts, ...staffShifts };
+        }
+      }
+      
       console.log('🔍 loadSchedule - Merged shifts:', mergedShifts);
+      console.log('🔍 loadSchedule - User role:', user?.role, 'Can see draft:', user?.role === 'admin');
       
       if (Object.keys(mergedShifts).length > 0) {
         setScheduleData(mergedShifts);
@@ -1106,10 +1145,29 @@ function ScheduleManagement({ user }) {
   const saveDraft = async () => {
     try {
       const draftId = `draft_${currentYear}_${currentMonth + 1}`;
+      
+      // ดึงข้อมูลร่างปัจจุบันก่อน (เพื่อรวมกับข้อมูลที่ Staff บันทึก)
+      const currentDraftDoc = await getDoc(doc(db, 'scheduleDrafts', draftId));
+      let existingShifts = {};
+      
+      if (currentDraftDoc.exists()) {
+        const currentDraftData = currentDraftDoc.data();
+        existingShifts = currentDraftData.shifts || {};
+      }
+      
+      // รวมข้อมูลใหม่กับข้อมูลเดิม (ข้อมูลใหม่จะทับข้อมูลเดิม)
+      const mergedShifts = { ...existingShifts, ...scheduleData };
+      
+      console.log('🔍 Admin บันทึกร่าง:', {
+        existingShifts,
+        newShifts: scheduleData,
+        mergedShifts
+      });
+      
       await setDoc(doc(db, 'scheduleDrafts', draftId), {
         month: currentMonth + 1,
         year: currentYear,
-        shifts: scheduleData,
+        shifts: mergedShifts,
         updatedAt: new Date().toISOString(),
         status: 'draft', // สถานะร่าง
         createdBy: user?.uid,
@@ -1118,7 +1176,7 @@ function ScheduleManagement({ user }) {
       });
       
       // เก็บข้อมูลร่างใน state
-      setDraftData(scheduleData);
+      setDraftData(mergedShifts);
       setHasDraft(true);
       setIsDraftMode(true);
       
@@ -3196,40 +3254,11 @@ function ScheduleManagement({ user }) {
                 onChange={(e) => setCurrentMonth(parseInt(e.target.value))}
                 className="month-dropdown"
               >
-                {user?.role === 'admin' ? (
-                  // Admin เห็นทุกเดือน
-                  Array.from({ length: 12 }, (_, i) => (
-                    <option key={i} value={i}>
-                      {getMonthNameByIndex(i)}
-                    </option>
-                  ))
-                ) : (
-                  // Staff เห็นแค่ย้อนหลัง 1 เดือน และล่วงหน้า 1 เดือน
-                  Array.from({ length: 12 }, (_, i) => {
-                    const currentDate = new Date();
-                    const currentMonthIndex = currentDate.getMonth();
-                    const currentYear = currentDate.getFullYear();
-                    
-                    // คำนวณเดือนที่อนุญาต (ย้อนหลัง 1 เดือน และล่วงหน้า 1 เดือน)
-                    const allowedMonths = [];
-                    for (let j = -1; j <= 1; j++) {
-                      const monthIndex = (currentMonthIndex + j + 12) % 12;
-                      const year = currentYear + Math.floor((currentMonthIndex + j) / 12);
-                      if (year === currentYear) {
-                        allowedMonths.push(monthIndex);
-                      }
-                    }
-                    
-                    if (allowedMonths.includes(i)) {
-                      return (
-                        <option key={i} value={i}>
-                          {getMonthNameByIndex(i)}
-                        </option>
-                      );
-                    }
-                    return null;
-                  }).filter(Boolean)
-                )}
+                {Array.from({ length: 12 }, (_, i) => (
+                  <option key={i} value={i}>
+                    {getMonthNameByIndex(i)}
+                  </option>
+                ))}
               </select>
             </div>
             <div className="year-selector">
@@ -3240,22 +3269,14 @@ function ScheduleManagement({ user }) {
                 onChange={(e) => setCurrentYear(parseInt(e.target.value))}
                 className="year-dropdown"
               >
-                {user?.role === 'admin' ? (
-                  // Admin เห็นทุกปี
-                  Array.from({ length: 21 }, (_, i) => {
-                    const year = currentYear - 10 + i;
-                    return (
-                      <option key={year} value={year}>
-                        {year}
-                      </option>
-                    );
-                  })
-                ) : (
-                  // Staff เห็นแค่ปีปัจจุบัน
-                  <option value={new Date().getFullYear()}>
-                    {new Date().getFullYear()}
-                  </option>
-                )}
+                {Array.from({ length: 21 }, (_, i) => {
+                  const year = currentYear - 10 + i;
+                  return (
+                    <option key={year} value={year}>
+                      {year}
+                    </option>
+                  );
+                })}
               </select>
             </div>
           </div>

@@ -1003,21 +1003,24 @@ function ScheduleManagement({ user }) {
         publishedShifts = scheduleData.shifts || {};
       }
       
-      // โหลดข้อมูลจาก scheduleDrafts collection
+      // โหลดข้อมูลจาก scheduleDrafts collection (เฉพาะ Admin เท่านั้น)
       const draftDoc = await getDoc(doc(db, 'scheduleDrafts', draftId));
       let draftShifts = {};
       
-      if (draftDoc.exists()) {
+      if (draftDoc.exists() && user?.role === 'admin') {
         const draftData = draftDoc.data();
-        console.log('🔍 loadSchedule - Found draft:', draftData);
+        console.log('🔍 loadSchedule - Found draft (Admin only):', draftData);
         if (draftData.status === 'draft') {
           draftShifts = draftData.shifts || {};
         }
       }
       
-      // รวมข้อมูลจากทั้ง 2 ที่ (draft จะทับ published)
-      const mergedShifts = { ...publishedShifts, ...draftShifts };
+      // รวมข้อมูลจากทั้ง 2 ที่ (draft จะทับ published) - เฉพาะ Admin
+      const mergedShifts = user?.role === 'admin' 
+        ? { ...publishedShifts, ...draftShifts }
+        : publishedShifts;
       console.log('🔍 loadSchedule - Merged shifts:', mergedShifts);
+      console.log('🔍 loadSchedule - User role:', user?.role, 'Can see draft:', user?.role === 'admin');
       
       if (Object.keys(mergedShifts).length > 0) {
         setScheduleData(mergedShifts);
@@ -3196,40 +3199,11 @@ function ScheduleManagement({ user }) {
                 onChange={(e) => setCurrentMonth(parseInt(e.target.value))}
                 className="month-dropdown"
               >
-                {user?.role === 'admin' ? (
-                  // Admin เห็นทุกเดือน
-                  Array.from({ length: 12 }, (_, i) => (
-                    <option key={i} value={i}>
-                      {getMonthNameByIndex(i)}
-                    </option>
-                  ))
-                ) : (
-                  // Staff เห็นแค่ย้อนหลัง 1 เดือน และล่วงหน้า 1 เดือน
-                  Array.from({ length: 12 }, (_, i) => {
-                    const currentDate = new Date();
-                    const currentMonthIndex = currentDate.getMonth();
-                    const currentYear = currentDate.getFullYear();
-                    
-                    // คำนวณเดือนที่อนุญาต (ย้อนหลัง 1 เดือน และล่วงหน้า 1 เดือน)
-                    const allowedMonths = [];
-                    for (let j = -1; j <= 1; j++) {
-                      const monthIndex = (currentMonthIndex + j + 12) % 12;
-                      const year = currentYear + Math.floor((currentMonthIndex + j) / 12);
-                      if (year === currentYear) {
-                        allowedMonths.push(monthIndex);
-                      }
-                    }
-                    
-                    if (allowedMonths.includes(i)) {
-                      return (
-                        <option key={i} value={i}>
-                          {getMonthNameByIndex(i)}
-                        </option>
-                      );
-                    }
-                    return null;
-                  }).filter(Boolean)
-                )}
+                {Array.from({ length: 12 }, (_, i) => (
+                  <option key={i} value={i}>
+                    {getMonthNameByIndex(i)}
+                  </option>
+                ))}
               </select>
             </div>
             <div className="year-selector">
@@ -3240,22 +3214,14 @@ function ScheduleManagement({ user }) {
                 onChange={(e) => setCurrentYear(parseInt(e.target.value))}
                 className="year-dropdown"
               >
-                {user?.role === 'admin' ? (
-                  // Admin เห็นทุกปี
-                  Array.from({ length: 21 }, (_, i) => {
-                    const year = currentYear - 10 + i;
-                    return (
-                      <option key={year} value={year}>
-                        {year}
-                      </option>
-                    );
-                  })
-                ) : (
-                  // Staff เห็นแค่ปีปัจจุบัน
-                  <option value={new Date().getFullYear()}>
-                    {new Date().getFullYear()}
-                  </option>
-                )}
+                {Array.from({ length: 21 }, (_, i) => {
+                  const year = currentYear - 10 + i;
+                  return (
+                    <option key={year} value={year}>
+                      {year}
+                    </option>
+                  );
+                })}
               </select>
             </div>
           </div>
