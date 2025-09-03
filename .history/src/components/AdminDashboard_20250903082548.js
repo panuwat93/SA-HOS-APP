@@ -1,0 +1,184 @@
+import React, { useState, useEffect } from 'react';
+import { Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '../firebase';
+import ChangePasswordModal from './ChangePasswordModal';
+import StaffManagement from './StaffManagement';
+import ScheduleManagement from './ScheduleManagement';
+import PreExchangeSchedule from './PreExchangeSchedule';
+import OnCallSchedule from './OnCallSchedule';
+import './AdminDashboard.css';
+
+import TaskAssignment from './TaskAssignment';
+
+function AdminDashboard() {
+  const [showChangePassword, setShowChangePassword] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+
+  useEffect(() => {
+    const checkUser = async () => {
+      try {
+        const currentUser = localStorage.getItem('currentUser');
+        if (currentUser) {
+          const userData = JSON.parse(currentUser);
+          if (userData.role === 'admin') {
+            // ดึงข้อมูลสิทธิ์จาก staff collection (ถ้ามี)
+            const staffDoc = await getDoc(doc(db, 'staff', userData.uid));
+            let staffData = {};
+            if (staffDoc.exists()) {
+              staffData = staffDoc.data();
+            }
+            // แอดมินมีสิทธิ์เต็ม
+            setUser({ 
+              ...userData, 
+              ...staffData,
+              canEditSchedule: true, 
+              canAssignTasks: true 
+            });
+          } else {
+            // ถ้าไม่ใช่แอดมิน ให้ไปหน้า staff
+            navigate('/staff');
+            return;
+          }
+        } else {
+          // ถ้าไม่มีข้อมูล ให้ไปหน้า login
+          navigate('/');
+          return;
+        }
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+        localStorage.removeItem('currentUser');
+        navigate('/');
+        return;
+      }
+      setLoading(false);
+    };
+
+    checkUser();
+  }, [navigate]);
+
+  const handleLogout = () => {
+    localStorage.removeItem('currentUser');
+    navigate('/');
+  };
+
+  if (loading) {
+    return (
+      <div className="admin-dashboard">
+        <div className="loading-spinner">กำลังโหลด...</div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="admin-dashboard">
+      <div className="header">
+        <h1>🏥 SA HOS APP</h1>
+        <p>ระบบจัดตารางเวรและมอบหมายงาน - แอดมิน</p>
+      </div>
+
+      <div className="nav-menu">
+        {/* แฮมเบอร์เกอร์เมนูสำหรับมือถือ */}
+        <div className="mobile-menu-toggle" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+          <span className={`hamburger ${isMobileMenuOpen ? 'active' : ''}`}></span>
+        </div>
+
+        {/* เมนูหลัก */}
+        <ul className={`nav-list ${isMobileMenuOpen ? 'mobile-open' : ''}`}>
+          <li className="nav-item">
+            <Link 
+              to="/admin" 
+              onClick={() => setIsMobileMenuOpen(false)}
+              className={location.pathname === '/admin' ? 'active' : ''}
+            >
+              📅 จัดตารางเวร
+            </Link>
+          </li>
+          <li className="nav-item">
+            <Link 
+              to="/admin/oncall" 
+              onClick={() => setIsMobileMenuOpen(false)}
+              className={location.pathname === '/admin/oncall' ? 'active' : ''}
+            >
+              📞 ตาราง On call
+            </Link>
+          </li>
+          <li className="nav-item">
+            <Link 
+              to="/admin/tasks" 
+              onClick={() => setIsMobileMenuOpen(false)}
+              className={location.pathname === '/admin/tasks' ? 'active' : ''}
+            >
+              📋 จัดตารางมอบหมายงาน
+            </Link>
+          </li>
+          <li className="nav-item">
+            <Link 
+              to="/admin/staff" 
+              onClick={() => setIsMobileMenuOpen(false)}
+              className={location.pathname === '/admin/staff' ? 'active' : ''}
+            >
+              👥 จัดการเจ้าหน้าที่
+            </Link>
+          </li>
+          <li className="nav-item">
+            <Link 
+              to="/admin/pre-exchange" 
+              onClick={() => setIsMobileMenuOpen(false)}
+              className={location.pathname === '/admin/pre-exchange' ? 'active' : ''}
+            >
+              📅 ตารางก่อนแลก
+            </Link>
+          </li>
+          <li className="nav-item">
+            <button 
+              onClick={() => {
+                setShowChangePassword(true);
+                setIsMobileMenuOpen(false);
+              }}
+              className="nav-button"
+              title="เปลี่ยนรหัสผ่าน"
+            >
+              ⚙️
+            </button>
+          </li>
+          <li className="nav-item">
+            <button 
+              onClick={() => {
+                handleLogout();
+                setIsMobileMenuOpen(false);
+              }} 
+              className="nav-button logout"
+              title="ออกจากระบบ"
+            >
+              ⎘
+            </button>
+          </li>
+        </ul>
+      </div>
+
+      <div className="container">
+        <Routes>
+          <Route path="/" element={<ScheduleManagement user={user} />} />
+          <Route path="/tasks" element={<TaskAssignment user={user} />} />
+          <Route path="/staff" element={<StaffManagement />} />
+          <Route path="/pre-exchange" element={<PreExchangeSchedule user={user} />} />
+          <Route path="/oncall" element={<OnCallSchedule user={user} />} />
+        </Routes>
+      </div>
+
+      {showChangePassword && (
+        <ChangePasswordModal 
+          onClose={() => setShowChangePassword(false)} 
+        />
+      )}
+    </div>
+  );
+}
+
+export default AdminDashboard;

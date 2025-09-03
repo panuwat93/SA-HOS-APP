@@ -983,47 +983,45 @@ function ScheduleManagement({ user }) {
 
   const loadSchedule = async () => {
     try {
-      console.log('🔍 loadSchedule - Starting...');
-      console.log('🔍 loadSchedule - Current month/year:', currentMonth + 1, currentYear);
-      console.log('🔍 loadSchedule - User role:', user?.role);
+          // console.log('🔍 loadSchedule - Starting...');
+    // console.log('🔍 loadSchedule - Current month/year:', currentMonth + 1, currentYear);
+    // console.log('🔍 loadSchedule - User canEditSchedule:', user?.canEditSchedule);
       
       const scheduleId = `schedule_${currentYear}_${currentMonth + 1}`;
-      const draftId = `draft_${currentYear}_${currentMonth + 1}`;
+              // console.log('🔍 loadSchedule - Schedule ID:', scheduleId);
       
-      console.log('🔍 loadSchedule - Schedule ID:', scheduleId);
-      console.log('🔍 loadSchedule - Draft ID:', draftId);
-      
-      // โหลดข้อมูลจาก schedules collection
       const scheduleDoc = await getDoc(doc(db, 'schedules', scheduleId));
-      let publishedShifts = {};
       
       if (scheduleDoc.exists()) {
         const scheduleData = scheduleDoc.data();
-        console.log('🔍 loadSchedule - Found published schedule:', scheduleData);
-        publishedShifts = scheduleData.shifts || {};
-      }
-      
-      // โหลดข้อมูลจาก scheduleDrafts collection
-      const draftDoc = await getDoc(doc(db, 'scheduleDrafts', draftId));
-      let draftShifts = {};
-      
-      if (draftDoc.exists()) {
-        const draftData = draftDoc.data();
-        console.log('🔍 loadSchedule - Found draft:', draftData);
-        if (draftData.status === 'draft') {
-          draftShifts = draftData.shifts || {};
+                  // console.log('🔍 loadSchedule - Found schedule data:', scheduleData);
+          // console.log('🔍 loadSchedule - Schedule status:', scheduleData.status);
+        
+        // ทุกคนเห็นข้อมูลเวรที่มีอยู่ (ไม่ว่าจะมีสิทธิ์อะไร)
+        if (scheduleData.shifts && Object.keys(scheduleData.shifts).length > 0) {
+                      // console.log('🔍 loadSchedule - Loading existing schedule data for all users');
+            // console.log('🔍 loadSchedule - Schedule data:', scheduleData.shifts);
+            // console.log('🔍 loadSchedule - User position:', user?.position);
+            // console.log('🔍 loadSchedule - User canEditSchedule:', user?.canEditSchedule);
+          setScheduleData(scheduleData.shifts);
+        } else {
+          // ถ้าไม่มีข้อมูลเวร ให้สร้างตารางเปล่า
+          // console.log('🔍 loadSchedule - No schedule data found, creating empty table');
+          const emptySchedule = {};
+          const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+          
+          for (let day = 1; day <= daysInMonth; day++) {
+            emptySchedule[day] = {};
+            staffList.forEach(staff => {
+              emptySchedule[day][staff.id] = '';
+            });
+          }
+          
+          setScheduleData(emptySchedule);
         }
-      }
-      
-      // รวมข้อมูลจากทั้ง 2 ที่ (draft จะทับ published)
-      const mergedShifts = { ...publishedShifts, ...draftShifts };
-      console.log('🔍 loadSchedule - Merged shifts:', mergedShifts);
-      
-      if (Object.keys(mergedShifts).length > 0) {
-        setScheduleData(mergedShifts);
       } else {
-        // ถ้าไม่มีข้อมูลเวร ให้สร้างตารางเปล่า
-        console.log('🔍 loadSchedule - No data found, creating empty table');
+        // console.log('🔍 loadSchedule - No schedule found, creating empty');
+        // สร้างตารางเปล่า
         const emptySchedule = {};
         const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
         
@@ -1063,31 +1061,10 @@ function ScheduleManagement({ user }) {
       } else {
         // เจ้าหน้าที่ทั่วไปบันทึกในร่างของ Admin
         const draftId = `draft_${currentYear}_${currentMonth + 1}`;
-        
-        // ดึงข้อมูลร่างปัจจุบันก่อน
-        const currentDraftDoc = await getDoc(doc(db, 'scheduleDrafts', draftId));
-        let existingShifts = {};
-        
-        if (currentDraftDoc.exists()) {
-          const currentDraftData = currentDraftDoc.data();
-          existingShifts = currentDraftData.shifts || {};
-        }
-        
-        // รวมข้อมูลใหม่กับข้อมูลเดิม (ข้อมูลใหม่จะทับข้อมูลเดิม)
-        const mergedShifts = { ...existingShifts, ...scheduleData };
-        
-        console.log('🔍 Staff บันทึก:', {
-          existingShifts,
-          newShifts: scheduleData,
-          mergedShifts,
-          scheduleDataKeys: Object.keys(scheduleData),
-          existingKeys: Object.keys(existingShifts)
-        });
-        
         await setDoc(doc(db, 'scheduleDrafts', draftId), {
           month: currentMonth + 1,
           year: currentYear,
-          shifts: mergedShifts,
+          shifts: scheduleData,
           updatedAt: new Date().toISOString(),
           status: 'draft', // สถานะร่าง
           createdBy: user?.uid,
@@ -1140,9 +1117,12 @@ function ScheduleManagement({ user }) {
         console.log('🔍 โหลดร่าง:', draftData);
         console.log('🔍 ข้อมูลเวรในร่าง:', draftData.shifts);
         
-        // แทนที่ข้อมูลทั้งหมดด้วยข้อมูลร่าง (เพราะร่างมีข้อมูลล่าสุด)
-        setScheduleData(draftData.shifts || {});
-        console.log('🔍 โหลดข้อมูลร่าง:', draftData.shifts);
+        // รวมข้อมูลร่างกับข้อมูลปัจจุบัน (ไม่แทนที่ทั้งหมด)
+        setScheduleData(prev => {
+          const mergedData = { ...prev, ...draftData.shifts };
+          console.log('🔍 รวมข้อมูล:', mergedData);
+          return mergedData;
+        });
         
         setDraftData(draftData.shifts || {});
         setHasDraft(true);

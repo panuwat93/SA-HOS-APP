@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
-import { auth, db } from '../firebase';
+import { collection, query, where, getDocs } from 'firebase/firestore';
+import { db } from '../firebase';
 import './Login.css';
 
 function Login() {
@@ -129,6 +128,7 @@ function Login() {
               </span>
               <div className="btn-loading-spinner"></div>
             </button>
+
 
           </form>
         </div>

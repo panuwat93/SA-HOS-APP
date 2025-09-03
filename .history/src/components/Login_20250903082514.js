@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
-import { auth, db } from '../firebase';
+import { collection, query, where, getDocs } from 'firebase/firestore';
+import { db } from '../firebase';
 import './Login.css';
 
 function Login() {
@@ -18,32 +17,45 @@ function Login() {
     setLoading(true);
 
     try {
-      // ใช้ username@sa-hos.com เป็น email สำหรับ Firebase
-      const email = `${username}@sa-hos.com`;
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      // ค้นหาผู้ใช้จาก Firestore โดยใช้ username
+      const usersRef = collection(db, 'users');
+      const q = query(usersRef, where('username', '==', username));
+      const querySnapshot = await getDocs(q);
       
-      // ตรวจสอบประเภทผู้ใช้จาก Firestore
-      const userDoc = await getDoc(doc(db, 'users', userCredential.user.uid));
-      if (userDoc.exists()) {
-        const userData = userDoc.data();
-        if (userData.role === 'admin') {
-          navigate('/admin');
-        } else {
-          navigate('/staff'); // หน้าสำหรับเจ้าหน้าที่ทั่วไป
+      if (querySnapshot.empty) {
+        setError('ไม่พบผู้ใช้นี้ กรุณาตรวจสอบ Username');
+        return;
+      }
+
+      // ตรวจสอบรหัสผ่าน
+      let userFound = false;
+      let userData = null;
+      
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        if (data.password === password) {
+          userFound = true;
+          userData = { ...data, uid: doc.id };
         }
-      } else {
-        // ถ้าไม่มีข้อมูลใน users collection ให้ไปหน้า admin (fallback)
+      });
+
+      if (!userFound) {
+        setError('รหัสผ่านไม่ถูกต้อง');
+        return;
+      }
+
+      // บันทึกข้อมูลผู้ใช้ใน localStorage
+      localStorage.setItem('currentUser', JSON.stringify(userData));
+
+      // นำทางตาม role
+      if (userData.role === 'admin') {
         navigate('/admin');
+      } else {
+        navigate('/staff');
       }
     } catch (error) {
       console.error('Login error:', error);
-      if (error.code === 'auth/user-not-found') {
-        setError('ไม่พบผู้ใช้นี้ กรุณาตรวจสอบ Username');
-      } else if (error.code === 'auth/wrong-password') {
-        setError('รหัสผ่านไม่ถูกต้อง');
-      } else {
-        setError('เกิดข้อผิดพลาดในการเข้าสู่ระบบ');
-      }
+      setError('เกิดข้อผิดพลาดในการเข้าสู่ระบบ');
     } finally {
       setLoading(false);
     }
@@ -129,6 +141,7 @@ function Login() {
               </span>
               <div className="btn-loading-spinner"></div>
             </button>
+
 
           </form>
         </div>

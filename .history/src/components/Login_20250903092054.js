@@ -130,6 +130,10 @@ function Login() {
               <div className="btn-loading-spinner"></div>
             </button>
 
+            <div className="register-link">
+              <p>ยังไม่มีบัญชี? <Link to="/register">สมัครสมาชิก</Link></p>
+            </div>
+
           </form>
         </div>
       </div>
